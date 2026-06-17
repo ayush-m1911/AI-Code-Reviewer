@@ -1,0 +1,112 @@
+diff1_python.txt
+diff2_javascript.txt
+diff3_typescript.txt
+# Python
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+
+venv/
+.venv/
+env/
+ENV/
+
+# Environment Variables
+
+.env
+.env.*
+!.env.example
+
+# IDE
+
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Files
+
+.DS_Store
+Thumbs.db
+
+# Logs
+
+logs/
+*.log
+
+# Testing
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Type Checking
+
+.mypy_cache/
+.pytype/
+
+# Build Artifacts
+
+build/
+dist/
+*.egg-info/
+
+# Jupyter
+
+.ipynb_checkpoints/
+
+# LangGraph / LangChain
+
+.langgraph/
+checkpoints/
+
+# Vector Databases
+
+faiss_index/
+vector_store/
+chroma_db/
+qdrant_storage/
+
+# Generated Files
+
+tmp/
+temp/
+
+# Runtime Files
+
+*.pid
+*.sqlite3
+*.db
+
+# Review Outputs (optional)
+
+# Uncomment if you don't want generated review JSONs tracked
+
+# reviews/*.json
+
+# Secrets
+
+secrets/
+credentials.json
+token.json
+token.pkl
+
+# FastAPI
+
+*.pid
+
+# Mac/Linux
+
+*.out
+
+# Docker
+
+docker-compose.override.yml
+
+# Misc
+
+.cache/
+coverage.xml

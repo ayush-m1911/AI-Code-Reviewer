@@ -1,0 +1,401 @@
+{
+  "review_id": "6c3aa8dd-f004-4af5-b027-d50c7c451fc3",
+  "pr_summary": "Automated review found 34 issue(s) across security, correctness, performance, style, and test coverage.",
+  "verdict": "request_changes",
+  "verdict_reason": "Critical issues were found.",
+  "overall_severity": "critical",
+  "findings": [
+    {
+      "id": "10a35c35",
+      "line": 7,
+      "line_content": "+    query = f\"SELECT * FROM transactions WHERE user_id = {user_id}\"",
+      "category": "security",
+      "severity": "critical",
+      "title": "SQL Injection",
+      "description": "User-controlled input is directly interpolated into a SQL query.",
+      "suggestion": "Use parameterized queries instead of string interpolation.",
+      "evidence": "query = f\"SELECT * FROM transactions WHERE user_id = {user_id}\""
+    },
+    {
+      "id": "5ddb011b",
+      "line": 11,
+      "line_content": "+def process_refund(request):",
+      "category": "security",
+      "severity": "high",
+      "title": "Missing Authorization",
+      "description": "Sensitive operation performed without permission, role, or authorization checks.",
+      "suggestion": "Implement appropriate role-based or permission-based checks before executing sensitive operations.",
+      "evidence": "def process_refund(request):"
+    },
+    {
+      "id": "823561a0",
+      "line": 15,
+      "line_content": "+        db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))",
+      "category": "security",
+      "severity": "critical",
+      "title": "SQL Injection",
+      "description": "User-controlled input is directly interpolated into a SQL query.",
+      "suggestion": "Use parameterized queries instead of string interpolation.",
+      "evidence": "db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))"
+    },
+    {
+      "id": "ebb13802",
+      "line": 21,
+      "line_content": "+    body = template.replace('{{message}}', message)",
+      "category": "security",
+      "severity": "high",
+      "title": "Potential Cross-Site Scripting (XSS)",
+      "description": "User-controlled data may be inserted into HTML without sanitization.",
+      "suggestion": "Escape or sanitize user-controlled content before rendering.",
+      "evidence": "body = template.replace('{{message}}', message)"
+    },
+    {
+      "id": "d0b36274",
+      "line": 24,
+      "line_content": "+@app.route('/refunds', methods=['POST'])",
+      "category": "security",
+      "severity": "high",
+      "title": "Missing Authorization",
+      "description": "Sensitive operation performed without permission, role, or authorization checks.",
+      "suggestion": "Implement appropriate role-based or permission-based checks before executing sensitive operations.",
+      "evidence": "@app.route('/refunds', methods=['POST'])"
+    },
+    {
+      "id": "424a3a74",
+      "line": 25,
+      "line_content": "+def refund_endpoint():",
+      "category": "security",
+      "severity": "high",
+      "title": "Missing Authorization",
+      "description": "Sensitive operation performed without permission, role, or authorization checks.",
+      "suggestion": "Implement appropriate role-based or permission-based checks before executing sensitive operations.",
+      "evidence": "def refund_endpoint():"
+    },
+    {
+      "id": "a7ddeac2",
+      "line": 30,
+      "line_content": "+STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'",
+      "category": "security",
+      "severity": "critical",
+      "title": "Hardcoded Secret",
+      "description": "A secret or credential appears to be committed directly into source code.",
+      "suggestion": "Move secrets into environment variables or a secret manager.",
+      "evidence": "STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'"
+    },
+    {
+      "id": "8e8557f6",
+      "line": 30,
+      "line_content": "",
+      "category": "security",
+      "severity": "critical",
+      "title": "Hardcoded Secrets",
+      "description": "Stripe secret key hardcoded on line 24.",
+      "suggestion": "Use environment variables or a secrets manager.",
+      "evidence": "STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'"
+    },
+    {
+      "id": "4b99ab41",
+      "line": 13,
+      "line_content": "+    if transaction['status'] == 'completed':",
+      "category": "correctness",
+      "severity": "high",
+      "title": "Missing Null Check",
+      "description": "transaction may be None before accessing status.",
+      "suggestion": "Check if transaction exists before use.",
+      "evidence": "if transaction['status'] == 'completed':"
+    },
+    {
+      "id": "3345a796",
+      "line": 20,
+      "line_content": "+    template = open('templates/email.html').read()",
+      "category": "correctness",
+      "severity": "medium",
+      "title": "Resource Leak",
+      "description": "Resource opened but never closed.",
+      "suggestion": "Use context managers or close resources.",
+      "evidence": "template = open('templates/email.html').read()"
+    },
+    {
+      "id": "925d3a5f",
+      "line": 26,
+      "line_content": "+    data = request.json",
+      "category": "correctness",
+      "severity": "high",
+      "title": "Missing Input Validation",
+      "description": "Incoming request data is not validated.",
+      "suggestion": "Validate required fields before processing.",
+      "evidence": "data = request.json"
+    },
+    {
+      "id": "f02a4c88",
+      "line": 13,
+      "line_content": "",
+      "category": "correctness",
+      "severity": "high",
+      "title": "Null Dereference",
+      "description": "Accessing transaction['status'] without checking if transaction is null.",
+      "suggestion": "Add a null check for transaction before accessing its properties.",
+      "evidence": "if transaction['status'] == 'completed':"
+    },
+    {
+      "id": "0c70fec6",
+      "line": 14,
+      "line_content": "",
+      "category": "correctness",
+      "severity": "high",
+      "title": "Null Dereference",
+      "description": "Accessing transaction['amount'] without checking if transaction is null.",
+      "suggestion": "Add a null check for transaction before accessing its properties.",
+      "evidence": "refund_amount = transaction['amount']"
+    },
+    {
+      "id": "e0b3080e",
+      "line": 15,
+      "line_content": "",
+      "category": "correctness",
+      "severity": "high",
+      "title": "Null Dereference",
+      "description": "Accessing transaction['id'] without checking if transaction is null.",
+      "suggestion": "Add a null check for transaction before accessing its properties.",
+      "evidence": "db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))"
+    },
+    {
+      "id": "d9cffcab",
+      "line": 7,
+      "line_content": "+    query = f\"SELECT * FROM transactions WHERE user_id = {user_id}\"",
+      "category": "style",
+      "severity": "low",
+      "title": "Inline SQL Statement",
+      "description": "Embedding SQL directly in business logic reduces maintainability.",
+      "suggestion": "Move queries into a repository or data-access layer.",
+      "evidence": "query = f\"SELECT * FROM transactions WHERE user_id = {user_id}\""
+    },
+    {
+      "id": "37718877",
+      "line": 15,
+      "line_content": "+        db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))",
+      "category": "style",
+      "severity": "low",
+      "title": "Inline SQL Statement",
+      "description": "Embedding SQL directly in business logic reduces maintainability.",
+      "suggestion": "Move queries into a repository or data-access layer.",
+      "evidence": "db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))"
+    },
+    {
+      "id": "5f2791dc",
+      "line": 30,
+      "line_content": "+STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'",
+      "category": "style",
+      "severity": "low",
+      "title": "Hardcoded Configuration Value",
+      "description": "Configuration is embedded directly in code.",
+      "suggestion": "Store configuration separately from application logic.",
+      "evidence": "STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'"
+    },
+    {
+      "id": "e4ff8080",
+      "line": 7,
+      "line_content": "",
+      "category": "style",
+      "severity": "low",
+      "title": "Inline SQL",
+      "description": "The SQL query is built via string concatenation, bypassing parameterized queries.",
+      "suggestion": "Use parameterized queries to prevent SQL injection.",
+      "evidence": "query = f\"SELECT * FROM transactions WHERE user_id = {user_id}\""
+    },
+    {
+      "id": "517dd08b",
+      "line": 15,
+      "line_content": "",
+      "category": "style",
+      "severity": "low",
+      "title": "Inline SQL",
+      "description": "The SQL query is built via string concatenation, bypassing parameterized queries.",
+      "suggestion": "Use parameterized queries to prevent SQL injection.",
+      "evidence": "db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))"
+    },
+    {
+      "id": "60972aa8",
+      "line": 30,
+      "line_content": "",
+      "category": "style",
+      "severity": "low",
+      "title": "Hardcoded Configuration",
+      "description": "The STRIPE_SECRET_KEY is hardcoded directly in the code.",
+      "suggestion": "Store sensitive configuration in environment variables or a secure configuration store.",
+      "evidence": "STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'"
+    },
+    {
+      "id": "261e0797",
+      "line": 11,
+      "line_content": "+def process_refund(request):",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Refund Edge Case Tests",
+      "description": "Refund logic was modified but edge cases are not verified.",
+      "suggestion": "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure.",
+      "evidence": "def process_refund(request):"
+    },
+    {
+      "id": "63e99173",
+      "line": 13,
+      "line_content": "+    if transaction['status'] == 'completed':",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing State Transition Tests",
+      "description": "Status updates require validation of state transitions.",
+      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
+      "evidence": "if transaction['status'] == 'completed':"
+    },
+    {
+      "id": "9532354d",
+      "line": 14,
+      "line_content": "+        refund_amount = transaction['amount']",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Refund Edge Case Tests",
+      "description": "Refund logic was modified but edge cases are not verified.",
+      "suggestion": "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure.",
+      "evidence": "refund_amount = transaction['amount']"
+    },
+    {
+      "id": "f7b120a8",
+      "line": 15,
+      "line_content": "+        db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Refund Edge Case Tests",
+      "description": "Refund logic was modified but edge cases are not verified.",
+      "suggestion": "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure.",
+      "evidence": "db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))"
+    },
+    {
+      "id": "916bc8ec",
+      "line": 15,
+      "line_content": "+        db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing State Transition Tests",
+      "description": "Status updates require validation of state transitions.",
+      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
+      "evidence": "db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))"
+    },
+    {
+      "id": "03feef92",
+      "line": 16,
+      "line_content": "+        send_notification(request['email'], f\"Refund of {refund_amount} processed\")",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Refund Edge Case Tests",
+      "description": "Refund logic was modified but edge cases are not verified.",
+      "suggestion": "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure.",
+      "evidence": "send_notification(request['email'], f\"Refund of {refund_amount} processed\")"
+    },
+    {
+      "id": "ac07618e",
+      "line": 17,
+      "line_content": "+        return {'status': 'success', 'amount': refund_amount}",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Refund Edge Case Tests",
+      "description": "Refund logic was modified but edge cases are not verified.",
+      "suggestion": "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure.",
+      "evidence": "return {'status': 'success', 'amount': refund_amount}"
+    },
+    {
+      "id": "bcebd687",
+      "line": 17,
+      "line_content": "+        return {'status': 'success', 'amount': refund_amount}",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing State Transition Tests",
+      "description": "Status updates require validation of state transitions.",
+      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
+      "evidence": "return {'status': 'success', 'amount': refund_amount}"
+    },
+    {
+      "id": "e0eece36",
+      "line": 24,
+      "line_content": "+@app.route('/refunds', methods=['POST'])",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Refund Edge Case Tests",
+      "description": "Refund logic was modified but edge cases are not verified.",
+      "suggestion": "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure.",
+      "evidence": "@app.route('/refunds', methods=['POST'])"
+    },
+    {
+      "id": "a45a6691",
+      "line": 25,
+      "line_content": "+def refund_endpoint():",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Refund Edge Case Tests",
+      "description": "Refund logic was modified but edge cases are not verified.",
+      "suggestion": "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure.",
+      "evidence": "def refund_endpoint():"
+    },
+    {
+      "id": "141e8345",
+      "line": 27,
+      "line_content": "+    result = process_refund(data)",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Refund Edge Case Tests",
+      "description": "Refund logic was modified but edge cases are not verified.",
+      "suggestion": "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure.",
+      "evidence": "result = process_refund(data)"
+    },
+    {
+      "id": "8149d82c",
+      "line": 9,
+      "line_content": "",
+      "category": "test_coverage",
+      "severity": "high",
+      "title": "Missing Transaction Lookup Test",
+      "description": "get_transaction function on line 14 retrieves transaction by user_id and transaction_id without checking for missing transaction.",
+      "suggestion": "Add unit tests checking: 1) missing transaction, 2) unauthorized transaction lookup.",
+      "evidence": "return db.execute(query).fetchone()"
+    },
+    {
+      "id": "8313bf3c",
+      "line": 15,
+      "line_content": "",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Refund Validation Tests",
+      "description": "process_refund function on line 20 updates transaction status without checking if transaction is already refunded.",
+      "suggestion": "Add unit tests checking: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund.",
+      "evidence": "db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))"
+    },
+    {
+      "id": "b7847999",
+      "line": 22,
+      "line_content": "",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing Notification Test",
+      "description": "send_notification function on line 25 sends email notification without checking SMTP connection status.",
+      "suggestion": "Add unit tests checking: 1) SMTP failure, 2) invalid email.",
+      "evidence": "smtp.send(email, body)"
+    }
+  ],
+  "positive_observations": [
+    "No performance issues detected."
+  ],
+  "missing_tests": [
+    "Add unit tests checking: 1) SMTP failure, 2) invalid email.",
+    "Add unit tests checking: 1) missing transaction, 2) unauthorized transaction lookup.",
+    "Add unit tests verifying valid and invalid state transitions.",
+    "Add unit tests checking: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund.",
+    "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure."
+  ],
+  "agent_findings_count": {
+    "security": 8,
+    "performance": 0,
+    "correctness": 6,
+    "style": 6,
+    "test_coverage": 14
+  },
+  "processing_time_ms": 0
+}

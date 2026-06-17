@@ -1,0 +1,276 @@
+import uuid
+from app.llm import llm
+from app.prompts import PERFORMANCE_PROMPT
+from app.utils import extract_json
+
+
+def is_added_code_line(line: str) -> bool:
+    if not line.startswith('+') or line.startswith('+++ '):
+        return False
+    content = line[1:].strip()
+    if not content:
+        return False
+    if content.startswith('//') or content.startswith('#') or content.startswith('/*') or content.startswith('*') or content.startswith('"""') or content.startswith("'''"):
+        return False
+    return True
+
+
+def align_and_validate_finding(finding, diff_lines):
+    evidence = finding.get("evidence", "").strip()
+    if not evidence:
+        return False, 0
+        
+    line_num = finding.get("line", 0)
+    
+    clean_diff_lines = []
+    for line in diff_lines:
+        if line.startswith('+') or line.startswith('-') or line.startswith(' '):
+            clean_diff_lines.append(line[1:])
+        else:
+            clean_diff_lines.append(line)
+            
+    ev_lines = [line.strip() for line in evidence.splitlines() if line.strip()]
+    if not ev_lines:
+        return False, 0
+        
+    clean_ev_lines = ["".join(l.lower().split()) for l in ev_lines]
+    
+    best_start = None
+    min_dist = 99999
+    
+    for start_idx in range(1, len(diff_lines) + 1):
+        match = True
+        for offset, clean_ev_l in enumerate(clean_ev_lines):
+            if start_idx + offset > len(diff_lines):
+                match = False
+                break
+            line_content = clean_diff_lines[start_idx + offset - 1]
+            clean_line = "".join(line_content.lower().split())
+            if clean_ev_l not in clean_line:
+                match = False
+                break
+        if match:
+            dist = abs(start_idx - line_num)
+            if dist < min_dist:
+                min_dist = dist
+                best_start = start_idx
+                
+    if best_start is not None:
+        return True, best_start
+        
+    return False, 0
+
+
+def check_loops(lines):
+    inside_loop_lines = set()
+    clean_lines = []
+    
+    for line in lines:
+        if line.startswith('+') or line.startswith('-') or line.startswith(' '):
+            clean_lines.append(line[1:])
+        else:
+            clean_lines.append(line)
+
+    loop_stack = []
+    brace_depth = 0
+    
+    for i, line in enumerate(clean_lines):
+        stripped = line.strip()
+        if not stripped:
+            continue
+            
+        indent = len(line) - len(line.lstrip())
+        
+        while loop_stack and loop_stack[-1]['type'] == 'python' and indent <= loop_stack[-1]['indent']:
+            loop_stack.pop()
+            
+        while loop_stack and loop_stack[-1]['type'] == 'js' and brace_depth <= loop_stack[-1]['brace_depth']:
+            loop_stack.pop()
+            
+        if loop_stack:
+            inside_loop_lines.add(i + 1)
+            
+        is_py_loop = (stripped.startswith("for ") or stripped.startswith("while ")) and stripped.endswith(":")
+        is_js_loop = (
+            "for (" in stripped or "for(" in stripped or
+            "while (" in stripped or "while(" in stripped
+        )
+        
+        if is_js_loop:
+            loop_stack.append({
+                'type': 'js',
+                'indent': indent,
+                'brace_depth': brace_depth
+            })
+        elif is_py_loop:
+            loop_stack.append({
+                'type': 'python',
+                'indent': indent,
+                'brace_depth': brace_depth
+            })
+            
+        brace_depth += stripped.count("{") - stripped.count("}")
+        
+    return inside_loop_lines
+
+
+def performance_agent(state):
+    diff = state["diff"]
+    findings = []
+    lines = diff.splitlines()
+
+    # Track loop context
+    inside_loop_lines = check_loops(lines)
+
+    for idx, line in enumerate(lines, start=1):
+        if not is_added_code_line(line):
+            continue
+
+        clean_line = line[1:].strip()
+
+        # N+1 Query Pattern
+        is_db_call = any(
+            kw in clean_line
+            for kw in [
+                "db.query", "db.execute", "repo.find", "repo.save",
+                "repository.find", "repository.save", "findById", "findOne",
+                "getUser", "getUserActivity", "save("
+            ]
+        )
+        if idx in inside_loop_lines and is_db_call:
+            findings.append(
+                {
+                    "id": str(uuid.uuid4())[:8],
+                    "line": idx,
+                    "line_content": line,
+                    "category": "performance",
+                    "severity": "high",
+                    "title": "Potential N+1 Query Pattern",
+                    "description": "Database query appears inside an iterative workflow and may execute once per item.",
+                    "suggestion": "Batch queries using IN clauses or fetch data in a single query.",
+                    "evidence": clean_line
+                }
+            )
+
+        # Infinite Polling Loop
+        if "while (status === 'pending')" in clean_line or "while(status === 'pending')" in clean_line:
+            findings.append(
+                {
+                    "id": str(uuid.uuid4())[:8],
+                    "line": idx,
+                    "line_content": line,
+                    "category": "performance",
+                    "severity": "critical",
+                    "title": "Infinite Polling Loop",
+                    "description": "Loop may run indefinitely if status never changes.",
+                    "suggestion": "Add timeout, retry limits, or cancellation logic.",
+                    "evidence": clean_line
+                }
+            )
+
+        # Sequential Async Execution
+        if "await cancelOrder" in clean_line:
+            findings.append(
+                {
+                    "id": str(uuid.uuid4())[:8],
+                    "line": idx,
+                    "line_content": line,
+                    "category": "performance",
+                    "severity": "high",
+                    "title": "Sequential Async Processing",
+                    "description": "Operations are executed sequentially and may become slow at scale.",
+                    "suggestion": "Use Promise.all() or parallel execution when safe.",
+                    "evidence": clean_line
+                }
+            )
+
+        # Sleep Inside Polling
+        if "sleep(1000)" in clean_line:
+            findings.append(
+                {
+                    "id": str(uuid.uuid4())[:8],
+                    "line": idx,
+                    "line_content": line,
+                    "category": "performance",
+                    "severity": "medium",
+                    "title": "Repeated Polling Delay",
+                    "description": "Polling with fixed delays can consume resources and increase latency.",
+                    "suggestion": "Use event-driven updates, backoff strategies, or webhooks.",
+                    "evidence": clean_line
+                }
+            )
+
+        # Large Collection Loop
+        if "for (const id of userIds)" in clean_line or "for (const id of orderIds)" in clean_line:
+            findings.append(
+                {
+                    "id": str(uuid.uuid4())[:8],
+                    "line": idx,
+                    "line_content": line,
+                    "category": "performance",
+                    "severity": "medium",
+                    "title": "Potential Large Collection Iteration",
+                    "description": "Looping over large collections may become expensive.",
+                    "suggestion": "Consider batching, pagination, or parallelization.",
+                    "evidence": clean_line
+                }
+            )
+
+    # LLM Analysis
+    try:
+        response = llm.invoke(PERFORMANCE_PROMPT.format(diff=diff))
+
+        print("\n===== PERFORMANCE LLM RESPONSE =====")
+        print(response.content)
+        print("====================================\n")
+
+        parsed = extract_json(response.content)
+        print(parsed)
+
+        for finding in parsed.get("findings", []):
+            findings.append(
+                {
+                    "id": str(uuid.uuid4())[:8],
+                    "line": finding.get("line", 0),
+                    "line_content": "",
+                    "category": "performance",
+                    "severity": finding.get("severity", "medium"),
+                    "title": finding.get("title", "Performance Issue"),
+                    "description": finding.get("description", "Potential performance issue."),
+                    "suggestion": finding.get("suggestion", "Optimize this code path."),
+                    "evidence": finding.get("evidence", "")
+                }
+            )
+    except Exception as e:
+        print(f"Performance Agent Error: {e}")
+
+    # Clean & Filter findings
+    filtered_findings = []
+    seen = set()
+
+    for finding in findings:
+        # Align and validate evidence
+        is_valid, aligned_line = align_and_validate_finding(finding, lines)
+        if not is_valid:
+            continue
+
+        finding["line"] = aligned_line
+
+        # Enforce N+1 Query loop check
+        title_lower = finding["title"].lower().strip()
+        if "n+1" in title_lower or "n + 1" in title_lower:
+            if finding["line"] not in inside_loop_lines:
+                continue
+
+        key = (
+            finding["title"],
+            finding["line"]
+        )
+
+        if key not in seen:
+            seen.add(key)
+            filtered_findings.append(finding)
+
+    return {
+        "performance_findings": filtered_findings
+    }

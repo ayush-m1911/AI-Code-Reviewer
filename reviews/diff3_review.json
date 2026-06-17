@@ -1,0 +1,400 @@
+{
+  "review_id": "9e243507-06c7-46f6-b30f-2040a13ee717",
+  "pr_summary": "Automated review found 34 issue(s) across security, correctness, performance, style, and test coverage.",
+  "verdict": "request_changes",
+  "verdict_reason": "Critical issues were found.",
+  "overall_severity": "critical",
+  "findings": [
+    {
+      "id": "f92ef716",
+      "line": 6,
+      "line_content": "+export async function cancelOrder(orderId: string, userId: string): Promise<void> {",
+      "category": "security",
+      "severity": "high",
+      "title": "IDOR",
+      "description": "Sensitive operation performed using externally supplied identifiers without ownership verification.",
+      "suggestion": "Verify that the requesting user owns the resource before processing the operation.",
+      "evidence": "export async function cancelOrder(orderId: string, userId: string): Promise<void> {"
+    },
+    {
+      "id": "c3f6f2ea",
+      "line": 6,
+      "line_content": "+export async function cancelOrder(orderId: string, userId: string): Promise<void> {",
+      "category": "security",
+      "severity": "high",
+      "title": "Missing Authorization",
+      "description": "Sensitive operation performed without permission, role, or authorization checks.",
+      "suggestion": "Implement appropriate role-based or permission-based checks before executing sensitive operations.",
+      "evidence": "export async function cancelOrder(orderId: string, userId: string): Promise<void> {"
+    },
+    {
+      "id": "72d1d093",
+      "line": 24,
+      "line_content": "+export async function bulkCancelOrders(orderIds: string[]): Promise<void> {",
+      "category": "security",
+      "severity": "high",
+      "title": "IDOR",
+      "description": "Sensitive operation performed using externally supplied identifiers without ownership verification.",
+      "suggestion": "Verify that the requesting user owns the resource before processing the operation.",
+      "evidence": "export async function bulkCancelOrders(orderIds: string[]): Promise<void> {"
+    },
+    {
+      "id": "924a1fbb",
+      "line": 24,
+      "line_content": "+export async function bulkCancelOrders(orderIds: string[]): Promise<void> {",
+      "category": "security",
+      "severity": "high",
+      "title": "Missing Authorization",
+      "description": "Sensitive operation performed without permission, role, or authorization checks.",
+      "suggestion": "Implement appropriate role-based or permission-based checks before executing sensitive operations.",
+      "evidence": "export async function bulkCancelOrders(orderIds: string[]): Promise<void> {"
+    },
+    {
+      "id": "12afb664",
+      "line": 26,
+      "line_content": "",
+      "category": "security",
+      "severity": "high",
+      "title": "IDOR",
+      "description": "Order cancellation performed using externally supplied identifiers without checking ownership.",
+      "suggestion": "Check ownership of the order before cancellation.",
+      "evidence": "await cancelOrder(id, 'system');"
+    },
+    {
+      "id": "f74563d5",
+      "line": 26,
+      "line_content": "",
+      "category": "security",
+      "severity": "high",
+      "title": "Missing Authorization",
+      "description": "Order cancellation performed without authorization, permission, or role checks.",
+      "suggestion": "Implement authorization checks before order cancellation.",
+      "evidence": "await cancelOrder(id, 'system');"
+    },
+    {
+      "id": "3667adf9",
+      "line": 16,
+      "line_content": "+  while (status === 'pending') {",
+      "category": "performance",
+      "severity": "critical",
+      "title": "Infinite Polling Loop",
+      "description": "Loop may run indefinitely if status never changes.",
+      "suggestion": "Add timeout, retry limits, or cancellation logic.",
+      "evidence": "while (status === 'pending') {"
+    },
+    {
+      "id": "625017c5",
+      "line": 17,
+      "line_content": "+    const order = await orderRepo.findById(orderId);",
+      "category": "performance",
+      "severity": "high",
+      "title": "Potential N+1 Query Pattern",
+      "description": "Database query appears inside an iterative workflow and may execute once per item.",
+      "suggestion": "Batch queries using IN clauses or fetch data in a single query.",
+      "evidence": "const order = await orderRepo.findById(orderId);"
+    },
+    {
+      "id": "2d72f5a8",
+      "line": 19,
+      "line_content": "+    await sleep(1000);",
+      "category": "performance",
+      "severity": "medium",
+      "title": "Repeated Polling Delay",
+      "description": "Polling with fixed delays can consume resources and increase latency.",
+      "suggestion": "Use event-driven updates, backoff strategies, or webhooks.",
+      "evidence": "await sleep(1000);"
+    },
+    {
+      "id": "369eb00a",
+      "line": 25,
+      "line_content": "+  for (const id of orderIds) {",
+      "category": "performance",
+      "severity": "medium",
+      "title": "Potential Large Collection Iteration",
+      "description": "Looping over large collections may become expensive.",
+      "suggestion": "Consider batching, pagination, or parallelization.",
+      "evidence": "for (const id of orderIds) {"
+    },
+    {
+      "id": "6d6813c3",
+      "line": 26,
+      "line_content": "+    await cancelOrder(id, 'system');",
+      "category": "performance",
+      "severity": "high",
+      "title": "Sequential Async Processing",
+      "description": "Operations are executed sequentially and may become slow at scale.",
+      "suggestion": "Use Promise.all() or parallel execution when safe.",
+      "evidence": "await cancelOrder(id, 'system');"
+    },
+    {
+      "id": "6602562c",
+      "line": 19,
+      "line_content": "",
+      "category": "performance",
+      "severity": "high",
+      "title": "Sequential awaits inside loop",
+      "description": "await sleep(1000) is used inside a loop without Promise.all, causing sequential execution of database/network operations.",
+      "suggestion": "Use Promise.all to execute database/network operations concurrently.",
+      "evidence": "await sleep(1000)"
+    },
+    {
+      "id": "abeebd37",
+      "line": 8,
+      "line_content": "+  order.status = 'cancelled';",
+      "category": "correctness",
+      "severity": "high",
+      "title": "Missing Order Null Check",
+      "description": "Order may not exist before status access.",
+      "suggestion": "Validate order before using it.",
+      "evidence": "order.status = 'cancelled';"
+    },
+    {
+      "id": "a195380a",
+      "line": 18,
+      "line_content": "+    status = order.status;",
+      "category": "correctness",
+      "severity": "high",
+      "title": "Missing Order Null Check",
+      "description": "Order may not exist before status access.",
+      "suggestion": "Validate order before using it.",
+      "evidence": "status = order.status;"
+    },
+    {
+      "id": "dbfb496b",
+      "line": 32,
+      "line_content": "+  return price * (1 - discounts[discountCode]);",
+      "category": "correctness",
+      "severity": "high",
+      "title": "Potential NaN Calculation",
+      "description": "Discount code may not exist in map.",
+      "suggestion": "Validate discount code or provide fallback.",
+      "evidence": "return price * (1 - discounts[discountCode]);"
+    },
+    {
+      "id": "089332eb",
+      "line": 17,
+      "line_content": "",
+      "category": "correctness",
+      "severity": "high",
+      "title": "Null Dereference",
+      "description": "Calling orderRepo.findById(orderId) without checking if order exists will throw an error if order is not found.",
+      "suggestion": "Add a null check for order before accessing its properties.",
+      "evidence": "const order = await orderRepo.findById(orderId);"
+    },
+    {
+      "id": "8854fcc9",
+      "line": 19,
+      "line_content": "+    await sleep(1000);",
+      "category": "style",
+      "severity": "low",
+      "title": "Magic Number",
+      "description": "Hardcoded numeric value reduces maintainability.",
+      "suggestion": "Extract the value into a named constant.",
+      "evidence": "await sleep(1000);"
+    },
+    {
+      "id": "5b0165e6",
+      "line": 31,
+      "line_content": "",
+      "category": "style",
+      "severity": "low",
+      "title": "Overuse of Generic Types",
+      "description": "The discounts object is explicitly typed as 'any', bypassing TypeScript type safety.",
+      "suggestion": "Define a proper type or interface for the discounts map.",
+      "evidence": "const discounts: any = { SAVE10: 0.1, SAVE20: 0.2, SAVE50: 0.5 }"
+    },
+    {
+      "id": "dc1b24a2",
+      "line": 6,
+      "line_content": "+export async function cancelOrder(orderId: string, userId: string): Promise<void> {",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Order Cancellation Tests",
+      "description": "Order cancellation flow lacks critical validation tests.",
+      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
+      "evidence": "export async function cancelOrder(orderId: string, userId: string): Promise<void> {"
+    },
+    {
+      "id": "b5bd9bff",
+      "line": 8,
+      "line_content": "+  order.status = 'cancelled';",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Order Cancellation Tests",
+      "description": "Order cancellation flow lacks critical validation tests.",
+      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
+      "evidence": "order.status = 'cancelled';"
+    },
+    {
+      "id": "92dba85b",
+      "line": 8,
+      "line_content": "+  order.status = 'cancelled';",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing State Transition Tests",
+      "description": "Status updates require validation of state transitions.",
+      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
+      "evidence": "order.status = 'cancelled';"
+    },
+    {
+      "id": "f12c5f8e",
+      "line": 9,
+      "line_content": "+  order.cancelledAt = new Date();",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Order Cancellation Tests",
+      "description": "Order cancellation flow lacks critical validation tests.",
+      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
+      "evidence": "order.cancelledAt = new Date();"
+    },
+    {
+      "id": "f284c3e0",
+      "line": 11,
+      "line_content": "+  await notificationService.send(order.userEmail, 'Order cancelled');",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Order Cancellation Tests",
+      "description": "Order cancellation flow lacks critical validation tests.",
+      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
+      "evidence": "await notificationService.send(order.userEmail, 'Order cancelled');"
+    },
+    {
+      "id": "fd545e97",
+      "line": 14,
+      "line_content": "+export async function pollOrderStatus(orderId: string): Promise<string> {",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing State Transition Tests",
+      "description": "Status updates require validation of state transitions.",
+      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
+      "evidence": "export async function pollOrderStatus(orderId: string): Promise<string> {"
+    },
+    {
+      "id": "7964c2a3",
+      "line": 15,
+      "line_content": "+  let status = 'pending';",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing State Transition Tests",
+      "description": "Status updates require validation of state transitions.",
+      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
+      "evidence": "let status = 'pending';"
+    },
+    {
+      "id": "1fb3458d",
+      "line": 16,
+      "line_content": "+  while (status === 'pending') {",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing State Transition Tests",
+      "description": "Status updates require validation of state transitions.",
+      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
+      "evidence": "while (status === 'pending') {"
+    },
+    {
+      "id": "3c0dbff2",
+      "line": 18,
+      "line_content": "+    status = order.status;",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing State Transition Tests",
+      "description": "Status updates require validation of state transitions.",
+      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
+      "evidence": "status = order.status;"
+    },
+    {
+      "id": "c389cd6e",
+      "line": 21,
+      "line_content": "+  return status;",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing State Transition Tests",
+      "description": "Status updates require validation of state transitions.",
+      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
+      "evidence": "return status;"
+    },
+    {
+      "id": "1b857121",
+      "line": 24,
+      "line_content": "+export async function bulkCancelOrders(orderIds: string[]): Promise<void> {",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Order Cancellation Tests",
+      "description": "Order cancellation flow lacks critical validation tests.",
+      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
+      "evidence": "export async function bulkCancelOrders(orderIds: string[]): Promise<void> {"
+    },
+    {
+      "id": "9837fc6c",
+      "line": 26,
+      "line_content": "+    await cancelOrder(id, 'system');",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Order Cancellation Tests",
+      "description": "Order cancellation flow lacks critical validation tests.",
+      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
+      "evidence": "await cancelOrder(id, 'system');"
+    },
+    {
+      "id": "4a789479",
+      "line": 30,
+      "line_content": "+export function calculateDiscount(price: number, discountCode: string): number {",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Discount Validation Tests",
+      "description": "Discount calculation logic may fail for invalid or expired codes.",
+      "suggestion": "Add unit tests checking: 1) invalid discount code, 2) expired discount code, and 3) unsupported discount code.",
+      "evidence": "export function calculateDiscount(price: number, discountCode: string): number {"
+    },
+    {
+      "id": "e45c4ee0",
+      "line": 31,
+      "line_content": "+  const discounts: any = { SAVE10: 0.1, SAVE20: 0.2, SAVE50: 0.5 };",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Discount Validation Tests",
+      "description": "Discount calculation logic may fail for invalid or expired codes.",
+      "suggestion": "Add unit tests checking: 1) invalid discount code, 2) expired discount code, and 3) unsupported discount code.",
+      "evidence": "const discounts: any = { SAVE10: 0.1, SAVE20: 0.2, SAVE50: 0.5 };"
+    },
+    {
+      "id": "f208788d",
+      "line": 32,
+      "line_content": "+  return price * (1 - discounts[discountCode]);",
+      "category": "test_coverage",
+      "severity": "medium",
+      "title": "Missing Discount Validation Tests",
+      "description": "Discount calculation logic may fail for invalid or expired codes.",
+      "suggestion": "Add unit tests checking: 1) invalid discount code, 2) expired discount code, and 3) unsupported discount code.",
+      "evidence": "return price * (1 - discounts[discountCode]);"
+    },
+    {
+      "id": "b43d8159",
+      "line": 11,
+      "line_content": "",
+      "category": "test_coverage",
+      "severity": "low",
+      "title": "Missing Notification Failure Tests",
+      "description": "notificationService.send function on line 18 does not handle cases where notification fails.",
+      "suggestion": "Add unit tests checking: 1) notification service returns an error, and 2) notification service returns a success response.",
+      "evidence": "await notificationService.send(order.userEmail, 'Order cancelled');"
+    }
+  ],
+  "positive_observations": [
+    "Code structure appears reasonable."
+  ],
+  "missing_tests": [
+    "Add unit tests checking: 1) notification service returns an error, and 2) notification service returns a success response.",
+    "Add unit tests checking: 1) invalid discount code, 2) expired discount code, and 3) unsupported discount code.",
+    "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
+    "Add unit tests verifying valid and invalid state transitions."
+  ],
+  "agent_findings_count": {
+    "security": 6,
+    "performance": 6,
+    "correctness": 4,
+    "style": 2,
+    "test_coverage": 16
+  },
+  "processing_time_ms": 0
+}
