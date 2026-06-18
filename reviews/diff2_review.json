@@ -1,12 +1,12 @@
 {
-  "review_id": "ed16e887-3424-4403-87be-c1047d7320f7",
+  "review_id": "ed891964-4e6b-483d-98e6-8e8cbb661cd6",
   "pr_summary": "Automated review found 14 issue(s) across security, correctness, performance, style, and test coverage.",
   "verdict": "request_changes",
   "verdict_reason": "Critical issues were found.",
   "overall_severity": "critical",
   "findings": [
     {
-      "id": "7bb5d92f",
+      "id": "a54f3c57",
       "line": 17,
       "line_content": "+async function resetPassword(req, res) {",
       "category": "security",
@@ -17,7 +17,7 @@
       "evidence": "async function resetPassword(req, res) {"
     },
     {
-      "id": "89049c66",
+      "id": "5db6893c",
       "line": 21,
       "line_content": "+    await db.query('UPDATE users SET password = ? WHERE email = ?',",
       "category": "security",
@@ -28,7 +28,7 @@
       "evidence": "await db.query('UPDATE users SET password = ? WHERE email = ?',"
     },
     {
-      "id": "8c3d8342",
+      "id": "52979df6",
       "line": 10,
       "line_content": "+  for (const id of userIds) {",
       "category": "performance",
@@ -39,7 +39,7 @@
       "evidence": "for (const id of userIds) {"
     },
     {
-      "id": "e648aaa4",
+      "id": "0103e67f",
       "line": 11,
       "line_content": "+    const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);",
       "category": "performance",
@@ -50,7 +50,7 @@
       "evidence": "const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);"
     },
     {
-      "id": "45a05cd7",
+      "id": "3cdd7e52",
       "line": 35,
       "line_content": "+    return { ...log, user: users[log.user_id] };",
       "category": "performance",
@@ -61,7 +61,18 @@
       "evidence": "return { ...log, user: users[log.user_id] };"
     },
     {
-      "id": "97e223a8",
+      "id": "e1d6b4c9",
+      "line": 12,
+      "line_content": "",
+      "category": "correctness",
+      "severity": "high",
+      "title": "Missing User Null Check",
+      "description": "user may be null or undefined before accessing its properties.",
+      "suggestion": "Add a check to verify that user exists before use.",
+      "evidence": "users.push(user[0]);"
+    },
+    {
+      "id": "80ba536e",
       "line": 8,
       "line_content": "+  const userIds = ids.split(',');",
       "category": "correctness",
@@ -72,7 +83,7 @@
       "evidence": "const userIds = ids.split(',');"
     },
     {
-      "id": "e9f8abd6",
+      "id": "9236fa1b",
       "line": 12,
       "line_content": "+    users.push(user[0]);",
       "category": "correctness",
@@ -83,18 +94,7 @@
       "evidence": "users.push(user[0]);"
     },
     {
-      "id": "4e147c6b",
-      "line": 12,
-      "line_content": "",
-      "category": "correctness",
-      "severity": "high",
-      "title": "Missing Query Parameter Validation",
-      "description": "user may be undefined, null, or not a string before split() is called, causing a runtime exception.",
-      "suggestion": "Validate req.query.user exists and is a string before calling split().",
-      "evidence": "users.push(user[0]);"
-    },
-    {
-      "id": "32462bec",
+      "id": "f6a281f5",
       "line": 11,
       "line_content": "+    const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);",
       "category": "style",
@@ -105,7 +105,7 @@
       "evidence": "const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);"
     },
     {
-      "id": "a835c437",
+      "id": "9409629b",
       "line": 19,
       "line_content": "+  const user = await db.query('SELECT * FROM users WHERE email = ?', [email]);",
       "category": "style",
@@ -116,7 +116,7 @@
       "evidence": "const user = await db.query('SELECT * FROM users WHERE email = ?', [email]);"
     },
     {
-      "id": "1834e987",
+      "id": "14885c85",
       "line": 21,
       "line_content": "+    await db.query('UPDATE users SET password = ? WHERE email = ?',",
       "category": "style",
@@ -127,7 +127,7 @@
       "evidence": "await db.query('UPDATE users SET password = ? WHERE email = ?',"
     },
     {
-      "id": "7ee8f1cf",
+      "id": "e3ed21ea",
       "line": 32,
       "line_content": "+    'SELECT * FROM activity_logs WHERE user_id = ?', [userId]",
       "category": "style",
@@ -138,7 +138,7 @@
       "evidence": "'SELECT * FROM activity_logs WHERE user_id = ?', [userId]"
     },
     {
-      "id": "1280ab1e",
+      "id": "11fec072",
       "line": 17,
       "line_content": "+async function resetPassword(req, res) {",
       "category": "test_coverage",
@@ -149,7 +149,7 @@
       "evidence": "async function resetPassword(req, res) {"
     },
     {
-      "id": "0c499438",
+      "id": "d0918573",
       "line": 25,
       "line_content": "+    res.status(404).json({ error: 'User not found' });",
       "category": "test_coverage",
@@ -164,8 +164,8 @@
     "Code structure appears reasonable."
   ],
   "missing_tests": [
-    "Add unit tests verifying: 1) user not found, 2) password hashing verification, 3) unauthorized reset, and 4) invalid email format.",
-    "Add unit tests verifying valid and invalid state transitions."
+    "Add unit tests verifying valid and invalid state transitions.",
+    "Add unit tests verifying: 1) user not found, 2) password hashing verification, 3) unauthorized reset, and 4) invalid email format."
   ],
   "agent_findings_count": {
     "security": 2,

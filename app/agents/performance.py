@@ -62,7 +62,8 @@ def align_and_validate_finding(finding, diff_lines):
 
 
 def check_loops(lines):
-    inside_loop_lines = set()
+    inside_collection_loop_lines = set()
+    inside_polling_loop_lines = set()
     clean_lines = []
     
     for line in lines:
@@ -81,37 +82,42 @@ def check_loops(lines):
             
         indent = len(line) - len(line.lstrip())
         
-        while loop_stack and loop_stack[-1]['type'] == 'python' and indent <= loop_stack[-1]['indent']:
+        while loop_stack and loop_stack[-1]['lang'] == 'python' and indent <= loop_stack[-1]['indent']:
             loop_stack.pop()
             
-        while loop_stack and loop_stack[-1]['type'] == 'js' and brace_depth <= loop_stack[-1]['brace_depth']:
+        while loop_stack and loop_stack[-1]['lang'] == 'js' and brace_depth <= loop_stack[-1]['brace_depth']:
             loop_stack.pop()
             
         if loop_stack:
-            inside_loop_lines.add(i + 1)
+            if any(l['loop_type'] == 'collection' for l in loop_stack):
+                inside_collection_loop_lines.add(i + 1)
+            else:
+                inside_polling_loop_lines.add(i + 1)
             
-        is_py_loop = (stripped.startswith("for ") or stripped.startswith("while ")) and stripped.endswith(":")
-        is_js_loop = (
-            "for (" in stripped or "for(" in stripped or
-            "while (" in stripped or "while(" in stripped
-        )
+        is_py_for = stripped.startswith("for ") and stripped.endswith(":")
+        is_py_while = stripped.startswith("while ") and stripped.endswith(":")
         
-        if is_js_loop:
+        is_js_for = ("for (" in stripped or "for(" in stripped or ".forEach(" in stripped or ".map(" in stripped or ".filter(" in stripped or ".reduce(" in stripped)
+        is_js_while = ("while (" in stripped or "while(" in stripped)
+        
+        if is_js_for or is_js_while:
             loop_stack.append({
-                'type': 'js',
+                'lang': 'js',
                 'indent': indent,
-                'brace_depth': brace_depth
+                'brace_depth': brace_depth,
+                'loop_type': 'collection' if is_js_for else 'polling'
             })
-        elif is_py_loop:
+        elif is_py_for or is_py_while:
             loop_stack.append({
-                'type': 'python',
+                'lang': 'python',
                 'indent': indent,
-                'brace_depth': brace_depth
+                'brace_depth': brace_depth,
+                'loop_type': 'collection' if is_py_for else 'polling'
             })
             
         brace_depth += stripped.count("{") - stripped.count("}")
         
-    return inside_loop_lines
+    return inside_collection_loop_lines, inside_polling_loop_lines
 
 
 def performance_agent(state):
@@ -120,7 +126,7 @@ def performance_agent(state):
     lines = diff.splitlines()
 
     # Track loop context
-    inside_loop_lines = check_loops(lines)
+    inside_collection_loop_lines, inside_polling_loop_lines = check_loops(lines)
 
     for idx, line in enumerate(lines, start=1):
         if not is_added_code_line(line):
@@ -137,7 +143,7 @@ def performance_agent(state):
                 "getUser", "getUserActivity", "save("
             ]
         )
-        if idx in inside_loop_lines and is_db_call:
+        if idx in inside_collection_loop_lines and is_db_call:
             findings.append(
                 {
                     "id": str(uuid.uuid4())[:8],
@@ -294,7 +300,7 @@ def performance_agent(state):
         # Enforce N+1 Query loop check
         title_lower = finding["title"].lower().strip()
         if "n+1" in title_lower or "n + 1" in title_lower:
-            if finding["line"] not in inside_loop_lines:
+            if finding["line"] not in inside_collection_loop_lines:
                 continue
 
         key = (

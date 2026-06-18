@@ -1,12 +1,12 @@
 {
-  "review_id": "d4e271f5-28c6-4dce-8e29-d6f9b775d1f3",
-  "pr_summary": "Automated review found 16 issue(s) across security, correctness, performance, style, and test coverage.",
+  "review_id": "5fe528eb-ec11-498f-81b0-36b8e97be20b",
+  "pr_summary": "Automated review found 15 issue(s) across security, correctness, performance, style, and test coverage.",
   "verdict": "request_changes",
   "verdict_reason": "Critical issues were found.",
   "overall_severity": "critical",
   "findings": [
     {
-      "id": "38a03aae",
+      "id": "be0976e6",
       "line": 7,
       "line_content": "+    query = f\"SELECT * FROM transactions WHERE user_id = {user_id}\"",
       "category": "security",
@@ -17,7 +17,7 @@
       "evidence": "query = f\"SELECT * FROM transactions WHERE user_id = {user_id}\""
     },
     {
-      "id": "90cd4517",
+      "id": "8e2541c6",
       "line": 15,
       "line_content": "+        db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))",
       "category": "security",
@@ -28,7 +28,7 @@
       "evidence": "db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))"
     },
     {
-      "id": "6a349d64",
+      "id": "e0a20871",
       "line": 21,
       "line_content": "+    body = template.replace('{{message}}', message)",
       "category": "security",
@@ -39,7 +39,7 @@
       "evidence": "body = template.replace('{{message}}', message)"
     },
     {
-      "id": "d165d154",
+      "id": "b10b5f25",
       "line": 30,
       "line_content": "+STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'",
       "category": "security",
@@ -50,7 +50,7 @@
       "evidence": "STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'"
     },
     {
-      "id": "3b9cf6f7",
+      "id": "0177d079",
       "line": 13,
       "line_content": "+    if transaction['status'] == 'completed':",
       "category": "correctness",
@@ -61,7 +61,7 @@
       "evidence": "if transaction['status'] == 'completed':"
     },
     {
-      "id": "93936d2d",
+      "id": "09dc47c6",
       "line": 20,
       "line_content": "+    template = open('templates/email.html').read()",
       "category": "correctness",
@@ -72,7 +72,7 @@
       "evidence": "template = open('templates/email.html').read()"
     },
     {
-      "id": "48265d14",
+      "id": "f95a16b5",
       "line": 26,
       "line_content": "+    data = request.json",
       "category": "correctness",
@@ -83,7 +83,7 @@
       "evidence": "data = request.json"
     },
     {
-      "id": "0efe605d",
+      "id": "6393b302",
       "line": 7,
       "line_content": "+    query = f\"SELECT * FROM transactions WHERE user_id = {user_id}\"",
       "category": "style",
@@ -94,7 +94,7 @@
       "evidence": "query = f\"SELECT * FROM transactions WHERE user_id = {user_id}\""
     },
     {
-      "id": "cd705548",
+      "id": "17a87794",
       "line": 15,
       "line_content": "+        db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))",
       "category": "style",
@@ -105,29 +105,18 @@
       "evidence": "db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))"
     },
     {
-      "id": "0deddc2c",
+      "id": "f6bdc3ea",
       "line": 30,
       "line_content": "+STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'",
       "category": "style",
       "severity": "low",
-      "title": "Hardcoded Configuration Value",
+      "title": "Hardcoded Configuration",
       "description": "Configuration is embedded directly in code.",
       "suggestion": "Store configuration separately from application logic.",
       "evidence": "STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'"
     },
     {
-      "id": "78bf1ada",
-      "line": 30,
-      "line_content": "",
-      "category": "style",
-      "severity": "low",
-      "title": "Hardcoded Configuration",
-      "description": "The STRIPE_SECRET_KEY is hardcoded directly in the code.",
-      "suggestion": "Store sensitive configuration in environment variables or a secure configuration store.",
-      "evidence": "STRIPE_SECRET_KEY = 'sk_live_4eC39HqLyjWDarjtT1zdp7dc'"
-    },
-    {
-      "id": "1979cd9a",
+      "id": "4629f0d8",
       "line": 11,
       "line_content": "+def process_refund(request):",
       "category": "test_coverage",
@@ -138,7 +127,7 @@
       "evidence": "def process_refund(request):"
     },
     {
-      "id": "7f16e109",
+      "id": "ee058fdc",
       "line": 13,
       "line_content": "+    if transaction['status'] == 'completed':",
       "category": "test_coverage",
@@ -149,7 +138,7 @@
       "evidence": "if transaction['status'] == 'completed':"
     },
     {
-      "id": "329d09c2",
+      "id": "005dece5",
       "line": 9,
       "line_content": "",
       "category": "test_coverage",
@@ -160,7 +149,7 @@
       "evidence": "return db.execute(query).fetchone()"
     },
     {
-      "id": "038d9588",
+      "id": "e406d1ec",
       "line": 15,
       "line_content": "",
       "category": "test_coverage",
@@ -171,7 +160,7 @@
       "evidence": "db.execute(\"UPDATE transactions SET status='refunded' WHERE id=\" + str(transaction['id']))"
     },
     {
-      "id": "33b3c487",
+      "id": "453f74a9",
       "line": 22,
       "line_content": "",
       "category": "test_coverage",
@@ -186,17 +175,17 @@
     "No performance issues detected."
   ],
   "missing_tests": [
-    "Add unit tests checking: 1) missing transaction, 2) unauthorized transaction lookup.",
-    "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure.",
     "Add unit tests verifying valid and invalid state transitions.",
-    "Add unit tests checking: 1) SMTP failure, 2) invalid email.",
-    "Add unit tests checking: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund."
+    "Add unit tests covering: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund, and 4) SMTP failure.",
+    "Add unit tests checking: 1) already refunded transaction, 2) missing transaction, 3) unauthorized refund.",
+    "Add unit tests checking: 1) missing transaction, 2) unauthorized transaction lookup.",
+    "Add unit tests checking: 1) SMTP failure, 2) invalid email."
   ],
   "agent_findings_count": {
     "security": 4,
     "performance": 0,
     "correctness": 3,
-    "style": 4,
+    "style": 3,
     "test_coverage": 5
   },
   "processing_time_ms": 0

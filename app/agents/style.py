@@ -191,6 +191,11 @@ def style_agent(state):
 
         finding["line"] = aligned_line
 
+        # Normalize Hardcoded Configuration titles
+        title_lower = finding["title"].lower().strip()
+        if any(term in title_lower for term in ["hardcoded configuration", "hardcoded config", "embedded configuration"]):
+            finding["title"] = "Hardcoded Configuration"
+
         key = (
             finding["title"],
             finding["line"]

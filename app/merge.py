@@ -16,6 +16,8 @@ def normalize_title(title: str) -> str:
     if not title:
         return ""
     t = title.lower().strip()
+    if any(term in t for term in ["hardcoded configuration", "hardcoded config", "embedded configuration"]):
+        return "hardcoded configuration"
     # Remove punctuation
     t = re.sub(r'[^\w\s]', '', t)
     # Remove common words
