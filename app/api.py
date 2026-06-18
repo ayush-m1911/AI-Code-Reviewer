@@ -33,9 +33,16 @@ def review_code(request: ReviewRequest):
         "review_report": {}
     }
 
+    import time
+    start_time = time.time()
     try:
         
         result = review_graph.invoke(state)
+        end_time = time.time()
+        processing_time_ms = int((end_time - start_time) * 1000)
+        
+        if "review_report" in result:
+            result["review_report"]["processing_time_ms"] = processing_time_ms
         
         print("\n===== GRAPH OUTPUT =====")
         print(result)

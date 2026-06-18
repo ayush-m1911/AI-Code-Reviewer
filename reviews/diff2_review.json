@@ -1,12 +1,12 @@
 {
-  "review_id": "ed891964-4e6b-483d-98e6-8e8cbb661cd6",
+  "review_id": "0315f0d0-6f7c-48f8-aaec-8a2fb439d584",
   "pr_summary": "Automated review found 14 issue(s) across security, correctness, performance, style, and test coverage.",
   "verdict": "request_changes",
   "verdict_reason": "Critical issues were found.",
   "overall_severity": "critical",
   "findings": [
     {
-      "id": "a54f3c57",
+      "id": "aa49b719",
       "line": 17,
       "line_content": "+async function resetPassword(req, res) {",
       "category": "security",
@@ -17,7 +17,7 @@
       "evidence": "async function resetPassword(req, res) {"
     },
     {
-      "id": "5db6893c",
+      "id": "8a5b1f8f",
       "line": 21,
       "line_content": "+    await db.query('UPDATE users SET password = ? WHERE email = ?',",
       "category": "security",
@@ -28,7 +28,7 @@
       "evidence": "await db.query('UPDATE users SET password = ? WHERE email = ?',"
     },
     {
-      "id": "52979df6",
+      "id": "80629177",
       "line": 10,
       "line_content": "+  for (const id of userIds) {",
       "category": "performance",
@@ -39,7 +39,7 @@
       "evidence": "for (const id of userIds) {"
     },
     {
-      "id": "0103e67f",
+      "id": "c1830593",
       "line": 11,
       "line_content": "+    const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);",
       "category": "performance",
@@ -50,7 +50,7 @@
       "evidence": "const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);"
     },
     {
-      "id": "3cdd7e52",
+      "id": "32188dca",
       "line": 35,
       "line_content": "+    return { ...log, user: users[log.user_id] };",
       "category": "performance",
@@ -61,7 +61,7 @@
       "evidence": "return { ...log, user: users[log.user_id] };"
     },
     {
-      "id": "e1d6b4c9",
+      "id": "845a779d",
       "line": 12,
       "line_content": "",
       "category": "correctness",
@@ -72,7 +72,7 @@
       "evidence": "users.push(user[0]);"
     },
     {
-      "id": "80ba536e",
+      "id": "56ce5061",
       "line": 8,
       "line_content": "+  const userIds = ids.split(',');",
       "category": "correctness",
@@ -83,7 +83,7 @@
       "evidence": "const userIds = ids.split(',');"
     },
     {
-      "id": "9236fa1b",
+      "id": "ba3c68c8",
       "line": 12,
       "line_content": "+    users.push(user[0]);",
       "category": "correctness",
@@ -94,7 +94,7 @@
       "evidence": "users.push(user[0]);"
     },
     {
-      "id": "f6a281f5",
+      "id": "d5a8f45e",
       "line": 11,
       "line_content": "+    const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);",
       "category": "style",
@@ -105,7 +105,7 @@
       "evidence": "const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);"
     },
     {
-      "id": "9409629b",
+      "id": "152acfc0",
       "line": 19,
       "line_content": "+  const user = await db.query('SELECT * FROM users WHERE email = ?', [email]);",
       "category": "style",
@@ -116,7 +116,7 @@
       "evidence": "const user = await db.query('SELECT * FROM users WHERE email = ?', [email]);"
     },
     {
-      "id": "14885c85",
+      "id": "918d0db3",
       "line": 21,
       "line_content": "+    await db.query('UPDATE users SET password = ? WHERE email = ?',",
       "category": "style",
@@ -127,7 +127,7 @@
       "evidence": "await db.query('UPDATE users SET password = ? WHERE email = ?',"
     },
     {
-      "id": "e3ed21ea",
+      "id": "17aded97",
       "line": 32,
       "line_content": "+    'SELECT * FROM activity_logs WHERE user_id = ?', [userId]",
       "category": "style",
@@ -138,7 +138,7 @@
       "evidence": "'SELECT * FROM activity_logs WHERE user_id = ?', [userId]"
     },
     {
-      "id": "11fec072",
+      "id": "373eebaa",
       "line": 17,
       "line_content": "+async function resetPassword(req, res) {",
       "category": "test_coverage",
@@ -149,7 +149,7 @@
       "evidence": "async function resetPassword(req, res) {"
     },
     {
-      "id": "d0918573",
+      "id": "1072f318",
       "line": 25,
       "line_content": "+    res.status(404).json({ error: 'User not found' });",
       "category": "test_coverage",
@@ -164,8 +164,8 @@
     "Code structure appears reasonable."
   ],
   "missing_tests": [
-    "Add unit tests verifying valid and invalid state transitions.",
-    "Add unit tests verifying: 1) user not found, 2) password hashing verification, 3) unauthorized reset, and 4) invalid email format."
+    "Add unit tests verifying: 1) user not found, 2) password hashing verification, 3) unauthorized reset, and 4) invalid email format.",
+    "Add unit tests verifying valid and invalid state transitions."
   ],
   "agent_findings_count": {
     "security": 2,
@@ -174,5 +174,5 @@
     "style": 4,
     "test_coverage": 2
   },
-  "processing_time_ms": 0
+  "processing_time_ms": 63225
 }

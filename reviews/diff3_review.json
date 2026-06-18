@@ -1,12 +1,12 @@
 {
-  "review_id": "349077ea-a20d-4083-8bd5-9e10fe5c2464",
+  "review_id": "fdf9f406-9f00-40ae-8ae8-57388905ca12",
   "pr_summary": "Automated review found 16 issue(s) across security, correctness, performance, style, and test coverage.",
   "verdict": "request_changes",
   "verdict_reason": "Critical issues were found.",
   "overall_severity": "critical",
   "findings": [
     {
-      "id": "2b4c5a20",
+      "id": "20f339f6",
       "line": 6,
       "line_content": "+export async function cancelOrder(orderId: string, userId: string): Promise<void> {",
       "category": "security",
@@ -17,7 +17,7 @@
       "evidence": "export async function cancelOrder(orderId: string, userId: string): Promise<void> {"
     },
     {
-      "id": "6372820c",
+      "id": "f30f18cc",
       "line": 24,
       "line_content": "+export async function bulkCancelOrders(orderIds: string[]): Promise<void> {",
       "category": "security",
@@ -28,7 +28,7 @@
       "evidence": "export async function bulkCancelOrders(orderIds: string[]): Promise<void> {"
     },
     {
-      "id": "6eeb22cb",
+      "id": "a82f5995",
       "line": 26,
       "line_content": "",
       "category": "security",
@@ -39,7 +39,7 @@
       "evidence": "await cancelOrder(id, 'system');"
     },
     {
-      "id": "19a414aa",
+      "id": "5f23b1b9",
       "line": 16,
       "line_content": "+  while (status === 'pending') {",
       "category": "performance",
@@ -50,7 +50,7 @@
       "evidence": "while (status === 'pending') {"
     },
     {
-      "id": "33f491d6",
+      "id": "3520b4c7",
       "line": 19,
       "line_content": "+    await sleep(1000);",
       "category": "performance",
@@ -61,7 +61,7 @@
       "evidence": "await sleep(1000);"
     },
     {
-      "id": "3bfd3406",
+      "id": "def61c20",
       "line": 25,
       "line_content": "+  for (const id of orderIds) {",
       "category": "performance",
@@ -72,7 +72,7 @@
       "evidence": "for (const id of orderIds) {"
     },
     {
-      "id": "92ba6084",
+      "id": "7bee639e",
       "line": 26,
       "line_content": "+    await cancelOrder(id, 'system');",
       "category": "performance",
@@ -83,7 +83,7 @@
       "evidence": "await cancelOrder(id, 'system');"
     },
     {
-      "id": "3c268a0b",
+      "id": "ac142a5a",
       "line": 19,
       "line_content": "",
       "category": "performance",
@@ -94,7 +94,7 @@
       "evidence": "await sleep(1000)"
     },
     {
-      "id": "1c580ea0",
+      "id": "4453afab",
       "line": 8,
       "line_content": "+  order.status = 'cancelled';",
       "category": "correctness",
@@ -105,7 +105,7 @@
       "evidence": "order.status = 'cancelled';"
     },
     {
-      "id": "ec7b7d52",
+      "id": "9f1068e6",
       "line": 32,
       "line_content": "+  return price * (1 - discounts[discountCode]);",
       "category": "correctness",
@@ -116,7 +116,7 @@
       "evidence": "return price * (1 - discounts[discountCode]);"
     },
     {
-      "id": "f5f38c65",
+      "id": "c15e9645",
       "line": 19,
       "line_content": "+    await sleep(1000);",
       "category": "style",
@@ -127,7 +127,7 @@
       "evidence": "await sleep(1000);"
     },
     {
-      "id": "fb9b0018",
+      "id": "956c88be",
       "line": 31,
       "line_content": "",
       "category": "style",
@@ -138,7 +138,7 @@
       "evidence": "const discounts: any = { SAVE10: 0.1, SAVE20: 0.2, SAVE50: 0.5 }"
     },
     {
-      "id": "30317974",
+      "id": "61efbddd",
       "line": 6,
       "line_content": "+export async function cancelOrder(orderId: string, userId: string): Promise<void> {",
       "category": "test_coverage",
@@ -149,7 +149,7 @@
       "evidence": "export async function cancelOrder(orderId: string, userId: string): Promise<void> {"
     },
     {
-      "id": "5e67f042",
+      "id": "f08c849c",
       "line": 8,
       "line_content": "+  order.status = 'cancelled';",
       "category": "test_coverage",
@@ -160,7 +160,7 @@
       "evidence": "order.status = 'cancelled';"
     },
     {
-      "id": "5086baba",
+      "id": "33c89461",
       "line": 30,
       "line_content": "+export function calculateDiscount(price: number, discountCode: string): number {",
       "category": "test_coverage",
@@ -171,13 +171,13 @@
       "evidence": "export function calculateDiscount(price: number, discountCode: string): number {"
     },
     {
-      "id": "863456a9",
+      "id": "4acd16b7",
       "line": 11,
       "line_content": "",
       "category": "test_coverage",
       "severity": "low",
       "title": "Missing Notification Failure Tests",
-      "description": "notificationService.send function on line 18 does not handle cases where notification fails.",
+      "description": "notificationService.send on line 18 does not handle cases where notification fails.",
       "suggestion": "Add unit tests checking: 1) notification service returns an error, and 2) notification service returns a success response.",
       "evidence": "await notificationService.send(order.userEmail, 'Order cancelled');"
     }
@@ -186,10 +186,10 @@
     "Code structure appears reasonable."
   ],
   "missing_tests": [
+    "Add unit tests checking: 1) notification service returns an error, and 2) notification service returns a success response.",
     "Add unit tests checking: 1) invalid discount code, 2) expired discount code, and 3) unsupported discount code.",
     "Add unit tests verifying valid and invalid state transitions.",
-    "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
-    "Add unit tests checking: 1) notification service returns an error, and 2) notification service returns a success response."
+    "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure."
   ],
   "agent_findings_count": {
     "security": 3,
@@ -198,5 +198,5 @@
     "style": 2,
     "test_coverage": 4
   },
-  "processing_time_ms": 0
+  "processing_time_ms": 57739
 }
