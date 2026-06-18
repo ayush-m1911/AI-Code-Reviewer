@@ -404,7 +404,7 @@ def correctness_agent(state):
                     is_query_param = False
                     for idx in range(func_start_idx, min(f["line"], len(clean_lines))):
                         line_content = clean_lines[idx]
-                        if re.search(r'\b' + re.escape(var_name) + r'\b', line_content) and (".query" in line_content or "req.query" in line_content):
+                        if re.search(r'\b' + re.escape(var_name) + r'\b', line_content) and ("req.query" in line_content or "request.query" in line_content):
                             is_query_param = True
                             break
                     if is_query_param:

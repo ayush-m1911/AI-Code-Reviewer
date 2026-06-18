@@ -1,12 +1,12 @@
 {
-  "review_id": "9d106d32-b745-44e2-a426-7bb23dcd6909",
-  "pr_summary": "Automated review found 29 issue(s) across security, correctness, performance, style, and test coverage.",
+  "review_id": "b4174325-8d4c-474c-9dc3-97fb0769c68f",
+  "pr_summary": "Automated review found 17 issue(s) across security, correctness, performance, style, and test coverage.",
   "verdict": "request_changes",
   "verdict_reason": "Critical issues were found.",
   "overall_severity": "critical",
   "findings": [
     {
-      "id": "d7921329",
+      "id": "3b3392e1",
       "line": 6,
       "line_content": "+export async function cancelOrder(orderId: string, userId: string): Promise<void> {",
       "category": "security",
@@ -17,7 +17,7 @@
       "evidence": "export async function cancelOrder(orderId: string, userId: string): Promise<void> {"
     },
     {
-      "id": "f25bf58d",
+      "id": "e23b17b9",
       "line": 24,
       "line_content": "+export async function bulkCancelOrders(orderIds: string[]): Promise<void> {",
       "category": "security",
@@ -28,7 +28,7 @@
       "evidence": "export async function bulkCancelOrders(orderIds: string[]): Promise<void> {"
     },
     {
-      "id": "f3d88cb1",
+      "id": "06993b37",
       "line": 26,
       "line_content": "",
       "category": "security",
@@ -39,7 +39,7 @@
       "evidence": "await cancelOrder(id, 'system');"
     },
     {
-      "id": "ac56fdec",
+      "id": "0da6316f",
       "line": 16,
       "line_content": "+  while (status === 'pending') {",
       "category": "performance",
@@ -50,7 +50,7 @@
       "evidence": "while (status === 'pending') {"
     },
     {
-      "id": "1c2fc17d",
+      "id": "bc09838d",
       "line": 17,
       "line_content": "+    const order = await orderRepo.findById(orderId);",
       "category": "performance",
@@ -61,7 +61,7 @@
       "evidence": "const order = await orderRepo.findById(orderId);"
     },
     {
-      "id": "481c6783",
+      "id": "e5d1ded2",
       "line": 19,
       "line_content": "+    await sleep(1000);",
       "category": "performance",
@@ -72,7 +72,7 @@
       "evidence": "await sleep(1000);"
     },
     {
-      "id": "ed7178bd",
+      "id": "fb43337e",
       "line": 25,
       "line_content": "+  for (const id of orderIds) {",
       "category": "performance",
@@ -83,7 +83,7 @@
       "evidence": "for (const id of orderIds) {"
     },
     {
-      "id": "83e37d87",
+      "id": "570aa42b",
       "line": 26,
       "line_content": "+    await cancelOrder(id, 'system');",
       "category": "performance",
@@ -94,7 +94,7 @@
       "evidence": "await cancelOrder(id, 'system');"
     },
     {
-      "id": "7e6a5e6f",
+      "id": "9c53d97a",
       "line": 19,
       "line_content": "",
       "category": "performance",
@@ -105,7 +105,7 @@
       "evidence": "await sleep(1000)"
     },
     {
-      "id": "cfdee4d4",
+      "id": "3640fd2b",
       "line": 8,
       "line_content": "+  order.status = 'cancelled';",
       "category": "correctness",
@@ -116,7 +116,7 @@
       "evidence": "order.status = 'cancelled';"
     },
     {
-      "id": "c9ee8d02",
+      "id": "d12b25c3",
       "line": 32,
       "line_content": "+  return price * (1 - discounts[discountCode]);",
       "category": "correctness",
@@ -127,7 +127,7 @@
       "evidence": "return price * (1 - discounts[discountCode]);"
     },
     {
-      "id": "cafaf882",
+      "id": "c6b96473",
       "line": 19,
       "line_content": "+    await sleep(1000);",
       "category": "style",
@@ -138,7 +138,7 @@
       "evidence": "await sleep(1000);"
     },
     {
-      "id": "071d2416",
+      "id": "fd0aff02",
       "line": 31,
       "line_content": "",
       "category": "style",
@@ -149,7 +149,7 @@
       "evidence": "const discounts: any = { SAVE10: 0.1, SAVE20: 0.2, SAVE50: 0.5 }"
     },
     {
-      "id": "2e88adf4",
+      "id": "f28f11f8",
       "line": 6,
       "line_content": "+export async function cancelOrder(orderId: string, userId: string): Promise<void> {",
       "category": "test_coverage",
@@ -160,18 +160,7 @@
       "evidence": "export async function cancelOrder(orderId: string, userId: string): Promise<void> {"
     },
     {
-      "id": "f082c8c1",
-      "line": 8,
-      "line_content": "+  order.status = 'cancelled';",
-      "category": "test_coverage",
-      "severity": "medium",
-      "title": "Missing Order Cancellation Tests",
-      "description": "Order cancellation flow lacks critical validation tests.",
-      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
-      "evidence": "order.status = 'cancelled';"
-    },
-    {
-      "id": "2feb71fd",
+      "id": "9f83b213",
       "line": 8,
       "line_content": "+  order.status = 'cancelled';",
       "category": "test_coverage",
@@ -182,106 +171,7 @@
       "evidence": "order.status = 'cancelled';"
     },
     {
-      "id": "9d086978",
-      "line": 9,
-      "line_content": "+  order.cancelledAt = new Date();",
-      "category": "test_coverage",
-      "severity": "medium",
-      "title": "Missing Order Cancellation Tests",
-      "description": "Order cancellation flow lacks critical validation tests.",
-      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
-      "evidence": "order.cancelledAt = new Date();"
-    },
-    {
-      "id": "8750f529",
-      "line": 11,
-      "line_content": "+  await notificationService.send(order.userEmail, 'Order cancelled');",
-      "category": "test_coverage",
-      "severity": "medium",
-      "title": "Missing Order Cancellation Tests",
-      "description": "Order cancellation flow lacks critical validation tests.",
-      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
-      "evidence": "await notificationService.send(order.userEmail, 'Order cancelled');"
-    },
-    {
-      "id": "bba32701",
-      "line": 14,
-      "line_content": "+export async function pollOrderStatus(orderId: string): Promise<string> {",
-      "category": "test_coverage",
-      "severity": "low",
-      "title": "Missing State Transition Tests",
-      "description": "Status updates require validation of state transitions.",
-      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
-      "evidence": "export async function pollOrderStatus(orderId: string): Promise<string> {"
-    },
-    {
-      "id": "b80eb8e5",
-      "line": 15,
-      "line_content": "+  let status = 'pending';",
-      "category": "test_coverage",
-      "severity": "low",
-      "title": "Missing State Transition Tests",
-      "description": "Status updates require validation of state transitions.",
-      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
-      "evidence": "let status = 'pending';"
-    },
-    {
-      "id": "2e210abb",
-      "line": 16,
-      "line_content": "+  while (status === 'pending') {",
-      "category": "test_coverage",
-      "severity": "low",
-      "title": "Missing State Transition Tests",
-      "description": "Status updates require validation of state transitions.",
-      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
-      "evidence": "while (status === 'pending') {"
-    },
-    {
-      "id": "947f976f",
-      "line": 18,
-      "line_content": "+    status = order.status;",
-      "category": "test_coverage",
-      "severity": "low",
-      "title": "Missing State Transition Tests",
-      "description": "Status updates require validation of state transitions.",
-      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
-      "evidence": "status = order.status;"
-    },
-    {
-      "id": "6864a6a1",
-      "line": 21,
-      "line_content": "+  return status;",
-      "category": "test_coverage",
-      "severity": "low",
-      "title": "Missing State Transition Tests",
-      "description": "Status updates require validation of state transitions.",
-      "suggestion": "Add unit tests verifying valid and invalid state transitions.",
-      "evidence": "return status;"
-    },
-    {
-      "id": "ecf9ef99",
-      "line": 24,
-      "line_content": "+export async function bulkCancelOrders(orderIds: string[]): Promise<void> {",
-      "category": "test_coverage",
-      "severity": "medium",
-      "title": "Missing Order Cancellation Tests",
-      "description": "Order cancellation flow lacks critical validation tests.",
-      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
-      "evidence": "export async function bulkCancelOrders(orderIds: string[]): Promise<void> {"
-    },
-    {
-      "id": "4a479817",
-      "line": 26,
-      "line_content": "+    await cancelOrder(id, 'system');",
-      "category": "test_coverage",
-      "severity": "medium",
-      "title": "Missing Order Cancellation Tests",
-      "description": "Order cancellation flow lacks critical validation tests.",
-      "suggestion": "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
-      "evidence": "await cancelOrder(id, 'system');"
-    },
-    {
-      "id": "62ad4daa",
+      "id": "049857e4",
       "line": 30,
       "line_content": "+export function calculateDiscount(price: number, discountCode: string): number {",
       "category": "test_coverage",
@@ -292,35 +182,13 @@
       "evidence": "export function calculateDiscount(price: number, discountCode: string): number {"
     },
     {
-      "id": "f5ccb60d",
-      "line": 31,
-      "line_content": "+  const discounts: any = { SAVE10: 0.1, SAVE20: 0.2, SAVE50: 0.5 };",
-      "category": "test_coverage",
-      "severity": "medium",
-      "title": "Missing Discount Validation Tests",
-      "description": "Discount calculation logic may fail for invalid or expired codes.",
-      "suggestion": "Add unit tests checking: 1) invalid discount code, 2) expired discount code, and 3) unsupported discount code.",
-      "evidence": "const discounts: any = { SAVE10: 0.1, SAVE20: 0.2, SAVE50: 0.5 };"
-    },
-    {
-      "id": "bb48d66b",
-      "line": 32,
-      "line_content": "+  return price * (1 - discounts[discountCode]);",
-      "category": "test_coverage",
-      "severity": "medium",
-      "title": "Missing Discount Validation Tests",
-      "description": "Discount calculation logic may fail for invalid or expired codes.",
-      "suggestion": "Add unit tests checking: 1) invalid discount code, 2) expired discount code, and 3) unsupported discount code.",
-      "evidence": "return price * (1 - discounts[discountCode]);"
-    },
-    {
-      "id": "237a1d77",
+      "id": "d8969b66",
       "line": 11,
       "line_content": "",
       "category": "test_coverage",
       "severity": "low",
       "title": "Missing Notification Failure Tests",
-      "description": "notificationService.send on line 18 does not handle cases where notification fails.",
+      "description": "notificationService.send function on line 18 does not handle cases where notification fails.",
       "suggestion": "Add unit tests checking: 1) notification service returns an error, and 2) notification service returns a success response.",
       "evidence": "await notificationService.send(order.userEmail, 'Order cancelled');"
     }
@@ -329,17 +197,17 @@
     "Code structure appears reasonable."
   ],
   "missing_tests": [
+    "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
     "Add unit tests checking: 1) notification service returns an error, and 2) notification service returns a success response.",
     "Add unit tests checking: 1) invalid discount code, 2) expired discount code, and 3) unsupported discount code.",
-    "Add unit tests verifying valid and invalid state transitions.",
-    "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure."
+    "Add unit tests verifying valid and invalid state transitions."
   ],
   "agent_findings_count": {
     "security": 3,
     "performance": 6,
     "correctness": 2,
     "style": 2,
-    "test_coverage": 16
+    "test_coverage": 4
   },
   "processing_time_ms": 0
 }

@@ -201,6 +201,39 @@ def test_coverage_agent(state):
             seen.add(key)
             filtered_findings.append(finding)
 
+    # Helper function to get severity rank
+    def get_severity_rank(sev):
+        ranks = {"critical": 4, "high": 3, "medium": 2, "low": 1}
+        return ranks.get(str(sev).lower().strip(), 0)
+
+    # Merge duplicate test findings by title
+    merged_by_title = {}
+    for f in filtered_findings:
+        title = f.get("title", "").strip()
+        if not title:
+            continue
+            
+        if title not in merged_by_title:
+            merged_by_title[title] = {
+                "id": f.get("id"),
+                "line": f.get("line"),
+                "line_content": f.get("line_content"),
+                "category": "test_coverage",
+                "severity": f.get("severity"),
+                "title": title,
+                "description": f.get("description"),
+                "suggestion": f.get("suggestion"),
+                "evidence": f.get("evidence")
+            }
+        else:
+            # Update to highest severity
+            current_sev = merged_by_title[title]["severity"]
+            new_sev = f.get("severity")
+            if get_severity_rank(new_sev) > get_severity_rank(current_sev):
+                merged_by_title[title]["severity"] = new_sev
+
+    final_test_findings = list(merged_by_title.values())
+
     return {
-        "test_findings": filtered_findings
+        "test_findings": final_test_findings
     }

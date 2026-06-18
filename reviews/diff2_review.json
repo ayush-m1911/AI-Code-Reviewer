@@ -1,12 +1,12 @@
 {
-  "review_id": "81be849f-b1ba-4d42-bb03-2e0b316e3256",
-  "pr_summary": "Automated review found 16 issue(s) across security, correctness, performance, style, and test coverage.",
+  "review_id": "ed16e887-3424-4403-87be-c1047d7320f7",
+  "pr_summary": "Automated review found 14 issue(s) across security, correctness, performance, style, and test coverage.",
   "verdict": "request_changes",
   "verdict_reason": "Critical issues were found.",
   "overall_severity": "critical",
   "findings": [
     {
-      "id": "81e66ecd",
+      "id": "7bb5d92f",
       "line": 17,
       "line_content": "+async function resetPassword(req, res) {",
       "category": "security",
@@ -17,7 +17,7 @@
       "evidence": "async function resetPassword(req, res) {"
     },
     {
-      "id": "366e765c",
+      "id": "89049c66",
       "line": 21,
       "line_content": "+    await db.query('UPDATE users SET password = ? WHERE email = ?',",
       "category": "security",
@@ -28,7 +28,7 @@
       "evidence": "await db.query('UPDATE users SET password = ? WHERE email = ?',"
     },
     {
-      "id": "891a50af",
+      "id": "8c3d8342",
       "line": 10,
       "line_content": "+  for (const id of userIds) {",
       "category": "performance",
@@ -39,7 +39,7 @@
       "evidence": "for (const id of userIds) {"
     },
     {
-      "id": "b0d4db14",
+      "id": "e648aaa4",
       "line": 11,
       "line_content": "+    const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);",
       "category": "performance",
@@ -50,7 +50,7 @@
       "evidence": "const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);"
     },
     {
-      "id": "779c96c5",
+      "id": "45a05cd7",
       "line": 35,
       "line_content": "+    return { ...log, user: users[log.user_id] };",
       "category": "performance",
@@ -61,7 +61,7 @@
       "evidence": "return { ...log, user: users[log.user_id] };"
     },
     {
-      "id": "c685e3ab",
+      "id": "97e223a8",
       "line": 8,
       "line_content": "+  const userIds = ids.split(',');",
       "category": "correctness",
@@ -72,7 +72,7 @@
       "evidence": "const userIds = ids.split(',');"
     },
     {
-      "id": "4c884adc",
+      "id": "e9f8abd6",
       "line": 12,
       "line_content": "+    users.push(user[0]);",
       "category": "correctness",
@@ -83,7 +83,7 @@
       "evidence": "users.push(user[0]);"
     },
     {
-      "id": "c1d26700",
+      "id": "4e147c6b",
       "line": 12,
       "line_content": "",
       "category": "correctness",
@@ -94,7 +94,7 @@
       "evidence": "users.push(user[0]);"
     },
     {
-      "id": "7be78a01",
+      "id": "32462bec",
       "line": 11,
       "line_content": "+    const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);",
       "category": "style",
@@ -105,7 +105,7 @@
       "evidence": "const user = await db.query('SELECT * FROM users WHERE id = ?', [id]);"
     },
     {
-      "id": "b7edc4cf",
+      "id": "a835c437",
       "line": 19,
       "line_content": "+  const user = await db.query('SELECT * FROM users WHERE email = ?', [email]);",
       "category": "style",
@@ -116,7 +116,7 @@
       "evidence": "const user = await db.query('SELECT * FROM users WHERE email = ?', [email]);"
     },
     {
-      "id": "dd1d9e97",
+      "id": "1834e987",
       "line": 21,
       "line_content": "+    await db.query('UPDATE users SET password = ? WHERE email = ?',",
       "category": "style",
@@ -127,7 +127,7 @@
       "evidence": "await db.query('UPDATE users SET password = ? WHERE email = ?',"
     },
     {
-      "id": "f2cbe086",
+      "id": "7ee8f1cf",
       "line": 32,
       "line_content": "+    'SELECT * FROM activity_logs WHERE user_id = ?', [userId]",
       "category": "style",
@@ -138,7 +138,7 @@
       "evidence": "'SELECT * FROM activity_logs WHERE user_id = ?', [userId]"
     },
     {
-      "id": "bf1ff999",
+      "id": "1280ab1e",
       "line": 17,
       "line_content": "+async function resetPassword(req, res) {",
       "category": "test_coverage",
@@ -149,29 +149,7 @@
       "evidence": "async function resetPassword(req, res) {"
     },
     {
-      "id": "763d142f",
-      "line": 21,
-      "line_content": "+    await db.query('UPDATE users SET password = ? WHERE email = ?',",
-      "category": "test_coverage",
-      "severity": "medium",
-      "title": "Missing Password Reset Tests",
-      "description": "Password reset or update logic has no accompanying verification tests.",
-      "suggestion": "Add unit tests verifying: 1) user not found, 2) password hashing verification, 3) unauthorized reset, and 4) invalid email format.",
-      "evidence": "await db.query('UPDATE users SET password = ? WHERE email = ?',"
-    },
-    {
-      "id": "ba454ca4",
-      "line": 23,
-      "line_content": "+    res.json({ message: 'Password updated' });",
-      "category": "test_coverage",
-      "severity": "medium",
-      "title": "Missing Password Reset Tests",
-      "description": "Password reset or update logic has no accompanying verification tests.",
-      "suggestion": "Add unit tests verifying: 1) user not found, 2) password hashing verification, 3) unauthorized reset, and 4) invalid email format.",
-      "evidence": "res.json({ message: 'Password updated' });"
-    },
-    {
-      "id": "75b06f72",
+      "id": "0c499438",
       "line": 25,
       "line_content": "+    res.status(404).json({ error: 'User not found' });",
       "category": "test_coverage",
@@ -194,7 +172,7 @@
     "performance": 3,
     "correctness": 3,
     "style": 4,
-    "test_coverage": 4
+    "test_coverage": 2
   },
   "processing_time_ms": 0
 }
