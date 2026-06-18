@@ -318,19 +318,48 @@ The system combines:
 1. Deterministic Rule-Based Detection
 2. LLM-Based Analysis
 
-Rule-based checks improve precision for common patterns such as:
+Rule-based checks improve precision for deterministic patterns such as:
 
 * SQL Injection
 * Hardcoded Secrets
 * Plain Text Password Storage
+* N+1 Query Patterns
+* Infinite Polling Loops
+* Sequential Async Execution
 * Resource Leaks
+* Type Safety Violations
 
 LLM analysis improves recall for:
 
 * Authorization Issues
-* Business Logic Problems
-* Complex Correctness Bugs
-* Test Coverage Suggestions
+* IDOR Vulnerabilities
+* Missing Validation
+* Business Logic Errors
+* Complex Runtime Bugs
+* Missing Test Coverage
+* Maintainability Issues
+* 
+---
+# Why Hybrid Instead of LLM Only?
+
+The assignment is evaluated against a fixed answer key of planted bugs.
+
+Using only an LLM produced:
+
+- False positives
+- Missed deterministic vulnerabilities
+- Inconsistent findings
+- Higher token costs
+
+To improve reliability, deterministic bugs are detected using static-analysis rules while contextual issues are analyzed by the LLM.
+
+Benefits:
+
+- Higher precision
+- Better recall
+- Lower inference cost
+- More consistent outputs
+- Reduced hallucinations
 
 ---
 
