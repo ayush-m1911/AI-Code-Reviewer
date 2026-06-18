@@ -4,7 +4,7 @@ from pathlib import Path
 import requests
 
 
-BASE_URL = "http://127.0.0.1:8001"
+BASE_URL = "http://127.0.0.1:8000"
 
 DIFF_FILES = [
     ("diff1_python.txt", "python"),

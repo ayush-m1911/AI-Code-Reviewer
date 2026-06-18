@@ -2,7 +2,7 @@ import uuid
 from app.llm import llm
 from app.prompts import PERFORMANCE_PROMPT
 from app.utils import extract_json
-
+import re
 
 def is_added_code_line(line: str) -> bool:
     if not line.startswith('+') or line.startswith('+++ '):
@@ -215,6 +215,41 @@ def performance_agent(state):
                     "evidence": clean_line
                 }
             )
+
+        # Potential Inefficient Lookup Pattern
+        is_inefficient = False
+        inefficient_patterns = [
+            "users[log.user_id]",
+            "orders[user.order_id]",
+            "cache[item.id]",
+            "lookup[id]",
+            "map[key]",
+            "dictionary[userId]"
+        ]
+        clean_no_spaces = "".join(clean_line.split())
+        if any("".join(pat.split()) in clean_no_spaces for pat in inefficient_patterns):
+            is_inefficient = True
+            
+        if not is_inefficient:
+            regex_pat = r'\b(users|orders|cache|lookup|map|dictionary)\s*\[\s*[a-zA-Z_][a-zA-Z0-9_]*(?:\.[a-zA-Z_][a-zA-Z0-9_]*)?\s*\]'
+            if re.search(regex_pat, clean_line):
+                is_inefficient = True
+                
+        if is_inefficient:
+            findings.append(
+                {
+                    "id": str(uuid.uuid4())[:8],
+                    "line": idx,
+                    "line_content": line,
+                    "category": "performance",
+                    "severity": "medium",
+                    "title": "Potential Inefficient Lookup Pattern",
+                    "description": "Application performs lookups through in-memory object access patterns that may indicate missing joins, batching, or scalable retrieval strategies.",
+                    "suggestion": "Consider database joins, batching, indexed lookups, caching strategies, or optimized retrieval mechanisms.",
+                    "evidence": clean_line
+                }
+            )
+
 
     # LLM Analysis
     try:

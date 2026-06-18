@@ -1,12 +1,12 @@
 {
-  "review_id": "9e243507-06c7-46f6-b30f-2040a13ee717",
-  "pr_summary": "Automated review found 34 issue(s) across security, correctness, performance, style, and test coverage.",
+  "review_id": "9d106d32-b745-44e2-a426-7bb23dcd6909",
+  "pr_summary": "Automated review found 29 issue(s) across security, correctness, performance, style, and test coverage.",
   "verdict": "request_changes",
   "verdict_reason": "Critical issues were found.",
   "overall_severity": "critical",
   "findings": [
     {
-      "id": "f92ef716",
+      "id": "d7921329",
       "line": 6,
       "line_content": "+export async function cancelOrder(orderId: string, userId: string): Promise<void> {",
       "category": "security",
@@ -17,18 +17,7 @@
       "evidence": "export async function cancelOrder(orderId: string, userId: string): Promise<void> {"
     },
     {
-      "id": "c3f6f2ea",
-      "line": 6,
-      "line_content": "+export async function cancelOrder(orderId: string, userId: string): Promise<void> {",
-      "category": "security",
-      "severity": "high",
-      "title": "Missing Authorization",
-      "description": "Sensitive operation performed without permission, role, or authorization checks.",
-      "suggestion": "Implement appropriate role-based or permission-based checks before executing sensitive operations.",
-      "evidence": "export async function cancelOrder(orderId: string, userId: string): Promise<void> {"
-    },
-    {
-      "id": "72d1d093",
+      "id": "f25bf58d",
       "line": 24,
       "line_content": "+export async function bulkCancelOrders(orderIds: string[]): Promise<void> {",
       "category": "security",
@@ -39,18 +28,7 @@
       "evidence": "export async function bulkCancelOrders(orderIds: string[]): Promise<void> {"
     },
     {
-      "id": "924a1fbb",
-      "line": 24,
-      "line_content": "+export async function bulkCancelOrders(orderIds: string[]): Promise<void> {",
-      "category": "security",
-      "severity": "high",
-      "title": "Missing Authorization",
-      "description": "Sensitive operation performed without permission, role, or authorization checks.",
-      "suggestion": "Implement appropriate role-based or permission-based checks before executing sensitive operations.",
-      "evidence": "export async function bulkCancelOrders(orderIds: string[]): Promise<void> {"
-    },
-    {
-      "id": "12afb664",
+      "id": "f3d88cb1",
       "line": 26,
       "line_content": "",
       "category": "security",
@@ -61,18 +39,7 @@
       "evidence": "await cancelOrder(id, 'system');"
     },
     {
-      "id": "f74563d5",
-      "line": 26,
-      "line_content": "",
-      "category": "security",
-      "severity": "high",
-      "title": "Missing Authorization",
-      "description": "Order cancellation performed without authorization, permission, or role checks.",
-      "suggestion": "Implement authorization checks before order cancellation.",
-      "evidence": "await cancelOrder(id, 'system');"
-    },
-    {
-      "id": "3667adf9",
+      "id": "ac56fdec",
       "line": 16,
       "line_content": "+  while (status === 'pending') {",
       "category": "performance",
@@ -83,7 +50,7 @@
       "evidence": "while (status === 'pending') {"
     },
     {
-      "id": "625017c5",
+      "id": "1c2fc17d",
       "line": 17,
       "line_content": "+    const order = await orderRepo.findById(orderId);",
       "category": "performance",
@@ -94,7 +61,7 @@
       "evidence": "const order = await orderRepo.findById(orderId);"
     },
     {
-      "id": "2d72f5a8",
+      "id": "481c6783",
       "line": 19,
       "line_content": "+    await sleep(1000);",
       "category": "performance",
@@ -105,7 +72,7 @@
       "evidence": "await sleep(1000);"
     },
     {
-      "id": "369eb00a",
+      "id": "ed7178bd",
       "line": 25,
       "line_content": "+  for (const id of orderIds) {",
       "category": "performance",
@@ -116,7 +83,7 @@
       "evidence": "for (const id of orderIds) {"
     },
     {
-      "id": "6d6813c3",
+      "id": "83e37d87",
       "line": 26,
       "line_content": "+    await cancelOrder(id, 'system');",
       "category": "performance",
@@ -127,7 +94,7 @@
       "evidence": "await cancelOrder(id, 'system');"
     },
     {
-      "id": "6602562c",
+      "id": "7e6a5e6f",
       "line": 19,
       "line_content": "",
       "category": "performance",
@@ -138,29 +105,18 @@
       "evidence": "await sleep(1000)"
     },
     {
-      "id": "abeebd37",
+      "id": "cfdee4d4",
       "line": 8,
       "line_content": "+  order.status = 'cancelled';",
       "category": "correctness",
       "severity": "high",
       "title": "Missing Order Null Check",
-      "description": "Order may not exist before status access.",
-      "suggestion": "Validate order before using it.",
+      "description": "order may be null or undefined before accessing its properties.",
+      "suggestion": "Add a check to verify that order exists before use.",
       "evidence": "order.status = 'cancelled';"
     },
     {
-      "id": "a195380a",
-      "line": 18,
-      "line_content": "+    status = order.status;",
-      "category": "correctness",
-      "severity": "high",
-      "title": "Missing Order Null Check",
-      "description": "Order may not exist before status access.",
-      "suggestion": "Validate order before using it.",
-      "evidence": "status = order.status;"
-    },
-    {
-      "id": "dbfb496b",
+      "id": "c9ee8d02",
       "line": 32,
       "line_content": "+  return price * (1 - discounts[discountCode]);",
       "category": "correctness",
@@ -171,18 +127,7 @@
       "evidence": "return price * (1 - discounts[discountCode]);"
     },
     {
-      "id": "089332eb",
-      "line": 17,
-      "line_content": "",
-      "category": "correctness",
-      "severity": "high",
-      "title": "Null Dereference",
-      "description": "Calling orderRepo.findById(orderId) without checking if order exists will throw an error if order is not found.",
-      "suggestion": "Add a null check for order before accessing its properties.",
-      "evidence": "const order = await orderRepo.findById(orderId);"
-    },
-    {
-      "id": "8854fcc9",
+      "id": "cafaf882",
       "line": 19,
       "line_content": "+    await sleep(1000);",
       "category": "style",
@@ -193,7 +138,7 @@
       "evidence": "await sleep(1000);"
     },
     {
-      "id": "5b0165e6",
+      "id": "071d2416",
       "line": 31,
       "line_content": "",
       "category": "style",
@@ -204,7 +149,7 @@
       "evidence": "const discounts: any = { SAVE10: 0.1, SAVE20: 0.2, SAVE50: 0.5 }"
     },
     {
-      "id": "dc1b24a2",
+      "id": "2e88adf4",
       "line": 6,
       "line_content": "+export async function cancelOrder(orderId: string, userId: string): Promise<void> {",
       "category": "test_coverage",
@@ -215,7 +160,7 @@
       "evidence": "export async function cancelOrder(orderId: string, userId: string): Promise<void> {"
     },
     {
-      "id": "b5bd9bff",
+      "id": "f082c8c1",
       "line": 8,
       "line_content": "+  order.status = 'cancelled';",
       "category": "test_coverage",
@@ -226,7 +171,7 @@
       "evidence": "order.status = 'cancelled';"
     },
     {
-      "id": "92dba85b",
+      "id": "2feb71fd",
       "line": 8,
       "line_content": "+  order.status = 'cancelled';",
       "category": "test_coverage",
@@ -237,7 +182,7 @@
       "evidence": "order.status = 'cancelled';"
     },
     {
-      "id": "f12c5f8e",
+      "id": "9d086978",
       "line": 9,
       "line_content": "+  order.cancelledAt = new Date();",
       "category": "test_coverage",
@@ -248,7 +193,7 @@
       "evidence": "order.cancelledAt = new Date();"
     },
     {
-      "id": "f284c3e0",
+      "id": "8750f529",
       "line": 11,
       "line_content": "+  await notificationService.send(order.userEmail, 'Order cancelled');",
       "category": "test_coverage",
@@ -259,7 +204,7 @@
       "evidence": "await notificationService.send(order.userEmail, 'Order cancelled');"
     },
     {
-      "id": "fd545e97",
+      "id": "bba32701",
       "line": 14,
       "line_content": "+export async function pollOrderStatus(orderId: string): Promise<string> {",
       "category": "test_coverage",
@@ -270,7 +215,7 @@
       "evidence": "export async function pollOrderStatus(orderId: string): Promise<string> {"
     },
     {
-      "id": "7964c2a3",
+      "id": "b80eb8e5",
       "line": 15,
       "line_content": "+  let status = 'pending';",
       "category": "test_coverage",
@@ -281,7 +226,7 @@
       "evidence": "let status = 'pending';"
     },
     {
-      "id": "1fb3458d",
+      "id": "2e210abb",
       "line": 16,
       "line_content": "+  while (status === 'pending') {",
       "category": "test_coverage",
@@ -292,7 +237,7 @@
       "evidence": "while (status === 'pending') {"
     },
     {
-      "id": "3c0dbff2",
+      "id": "947f976f",
       "line": 18,
       "line_content": "+    status = order.status;",
       "category": "test_coverage",
@@ -303,7 +248,7 @@
       "evidence": "status = order.status;"
     },
     {
-      "id": "c389cd6e",
+      "id": "6864a6a1",
       "line": 21,
       "line_content": "+  return status;",
       "category": "test_coverage",
@@ -314,7 +259,7 @@
       "evidence": "return status;"
     },
     {
-      "id": "1b857121",
+      "id": "ecf9ef99",
       "line": 24,
       "line_content": "+export async function bulkCancelOrders(orderIds: string[]): Promise<void> {",
       "category": "test_coverage",
@@ -325,7 +270,7 @@
       "evidence": "export async function bulkCancelOrders(orderIds: string[]): Promise<void> {"
     },
     {
-      "id": "9837fc6c",
+      "id": "4a479817",
       "line": 26,
       "line_content": "+    await cancelOrder(id, 'system');",
       "category": "test_coverage",
@@ -336,7 +281,7 @@
       "evidence": "await cancelOrder(id, 'system');"
     },
     {
-      "id": "4a789479",
+      "id": "62ad4daa",
       "line": 30,
       "line_content": "+export function calculateDiscount(price: number, discountCode: string): number {",
       "category": "test_coverage",
@@ -347,7 +292,7 @@
       "evidence": "export function calculateDiscount(price: number, discountCode: string): number {"
     },
     {
-      "id": "e45c4ee0",
+      "id": "f5ccb60d",
       "line": 31,
       "line_content": "+  const discounts: any = { SAVE10: 0.1, SAVE20: 0.2, SAVE50: 0.5 };",
       "category": "test_coverage",
@@ -358,7 +303,7 @@
       "evidence": "const discounts: any = { SAVE10: 0.1, SAVE20: 0.2, SAVE50: 0.5 };"
     },
     {
-      "id": "f208788d",
+      "id": "bb48d66b",
       "line": 32,
       "line_content": "+  return price * (1 - discounts[discountCode]);",
       "category": "test_coverage",
@@ -369,13 +314,13 @@
       "evidence": "return price * (1 - discounts[discountCode]);"
     },
     {
-      "id": "b43d8159",
+      "id": "237a1d77",
       "line": 11,
       "line_content": "",
       "category": "test_coverage",
       "severity": "low",
       "title": "Missing Notification Failure Tests",
-      "description": "notificationService.send function on line 18 does not handle cases where notification fails.",
+      "description": "notificationService.send on line 18 does not handle cases where notification fails.",
       "suggestion": "Add unit tests checking: 1) notification service returns an error, and 2) notification service returns a success response.",
       "evidence": "await notificationService.send(order.userEmail, 'Order cancelled');"
     }
@@ -386,13 +331,13 @@
   "missing_tests": [
     "Add unit tests checking: 1) notification service returns an error, and 2) notification service returns a success response.",
     "Add unit tests checking: 1) invalid discount code, 2) expired discount code, and 3) unsupported discount code.",
-    "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure.",
-    "Add unit tests verifying valid and invalid state transitions."
+    "Add unit tests verifying valid and invalid state transitions.",
+    "Add unit tests for: 1) already cancelled order, 2) invalid order ID, 3) permission denied (unauthorized), and 4) notification failure."
   ],
   "agent_findings_count": {
-    "security": 6,
+    "security": 3,
     "performance": 6,
-    "correctness": 4,
+    "correctness": 2,
     "style": 2,
     "test_coverage": 16
   },

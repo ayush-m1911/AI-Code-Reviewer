@@ -1,3 +1,5 @@
+import re
+
 def normalize(text):
 
     if not text:
@@ -9,6 +11,24 @@ def normalize(text):
         .replace("-", "")
         .replace("_", "")
     )
+
+def normalize_title(title: str) -> str:
+    if not title:
+        return ""
+    t = title.lower().strip()
+    # Remove punctuation
+    t = re.sub(r'[^\w\s]', '', t)
+    # Remove common words
+    for word in ["statement", "pattern", "issue", "potential"]:
+        t = t.replace(word, "")
+    t = " ".join(t.split())
+    # Handle plural/singular
+    if t.endswith("s"):
+        if t.endswith("ies"):
+            t = t[:-3] + "y"
+        else:
+            t = t[:-1]
+    return t.strip()
 def merge_node(state):
 
     security = state.get(
@@ -58,11 +78,12 @@ def merge_node(state):
             ""
         )
 
-        title = finding.get("title", "").lower().strip()
+        title = finding.get("title", "")
+        norm_title = normalize_title(title)
 
         key = (
             category,
-            title,
+            norm_title,
             finding.get("line", 0)
         )
 
@@ -75,6 +96,16 @@ def merge_node(state):
             )
 
     findings = unique_findings
+
+    # Suppress Missing Authorization if IDOR exists on the same line
+    idor_lines = {f.get("line", 0) for f in findings if f.get("title", "").lower().strip() == "idor"}
+    filtered_findings = []
+    for f in findings:
+        title_lower = f.get("title", "").lower().strip()
+        if title_lower == "missing authorization" and f.get("line", 0) in idor_lines:
+            continue
+        filtered_findings.append(f)
+    findings = filtered_findings
 
     # ----------------------------
     # Count findings

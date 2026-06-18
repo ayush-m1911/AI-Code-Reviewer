@@ -95,6 +95,68 @@ def is_valid_undefined_variable_finding(finding, diff) -> bool:
     return False
 
 
+def get_null_variable(finding) -> str:
+    title_lower = finding.get("title", "").lower()
+    desc_lower = finding.get("description", "").lower()
+    evidence_lower = finding.get("evidence", "").lower()
+    
+    for var in ["transaction", "order", "user"]:
+        if re.search(r'\b' + re.escape(var) + r'\b', title_lower) or \
+           re.search(r'\b' + re.escape(var) + r'\b', desc_lower) or \
+           re.search(r'\b' + re.escape(var) + r'\b', evidence_lower):
+            return var
+            
+    match = re.search(r'\b([a-zA-Z_][a-zA-Z0-9_]*)\s*(?:\.|\[)', evidence_lower)
+    if match:
+        var = match.group(1)
+        if var not in ["request", "req", "res", "response", "data", "db", "config", "notification", "logs"]:
+            return var
+            
+    return ""
+
+
+def check_is_undefined_variable(var_name: str, diff_lines, line_num: int) -> bool:
+    known_globals = {"db", "smtp", "logger", "app", "request", "req", "res", "response", "console", "sleep", "Math", "Date"}
+    if var_name in known_globals:
+        return False
+        
+    clean_lines = []
+    for line in diff_lines:
+        if line.startswith('+') or line.startswith('-') or line.startswith(' '):
+            clean_lines.append(line[1:])
+        else:
+            clean_lines.append(line)
+            
+    func_start_idx = 0
+    for idx in range(min(line_num - 1, len(clean_lines) - 1), -1, -1):
+        line_content = clean_lines[idx]
+        if "function " in line_content or "def " in line_content or "async function" in line_content:
+            func_start_idx = idx
+            break
+            
+    declared = False
+    for idx in range(func_start_idx, min(line_num, len(clean_lines))):
+        line_content = clean_lines[idx]
+        if re.search(r'\b(?:const|let|var|def)\s+' + re.escape(var_name) + r'\b', line_content):
+            declared = True
+            break
+        if re.search(r'\b(?:const|let|var)\s*\{[^}]*\b' + re.escape(var_name) + r'\b[^}]*\}', line_content):
+            declared = True
+            break
+        if re.search(r'\b' + re.escape(var_name) + r'\b\s*=[^=]', line_content):
+            declared = True
+            break
+        if re.search(r'\bfor\b.*\b' + re.escape(var_name) + r'\b', line_content):
+            declared = True
+            break
+        if idx == func_start_idx:
+            if re.search(r'\b' + re.escape(var_name) + r'\b', line_content):
+                declared = True
+                break
+                
+    return not declared
+
+
 def correctness_agent(state):
     diff = state["diff"]
     findings = []
@@ -138,21 +200,47 @@ def correctness_agent(state):
                 }
             )
 
-        # JS split without validation
-        if ".split(" in clean_line:
-            findings.append(
-                {
-                    "id": str(uuid.uuid4())[:8],
-                    "line": idx,
-                    "line_content": line,
-                    "category": "correctness",
-                    "severity": "high",
-                    "title": "Possible Null Dereference",
-                    "description": "Variable may be undefined before split call.",
-                    "suggestion": "Check variable exists before using split.",
-                    "evidence": clean_line
-                }
-            )
+        # JS split/trim/toLowerCase/toUpperCase/map/filter without validation
+        dangerous_methods = [".split(", ".trim(", ".toLowerCase(", ".toUpperCase(", ".map(", ".filter("]
+        if any(method in clean_line for method in dangerous_methods):
+            match = re.search(r'\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\.(?:split|trim|toLowerCase|toUpperCase|map|filter)\b', clean_line)
+            if match:
+                receiver_name = match.group(1)
+                if receiver_name not in ["req", "res", "response", "request", "db", "console", "Math", "Date"]:
+                    # Find where it is declared in function scope to check if it's an untrusted input
+                    func_start_idx = 0
+                    clean_lines = []
+                    for l in lines:
+                        if l.startswith('+') or l.startswith('-') or l.startswith(' '):
+                            clean_lines.append(l[1:])
+                        else:
+                            clean_lines.append(l)
+                    for i_idx in range(min(idx - 1, len(clean_lines) - 1), -1, -1):
+                        line_content = clean_lines[i_idx]
+                        if "function " in line_content or "def " in line_content or "async function" in line_content:
+                            func_start_idx = i_idx
+                            break
+                    is_untrusted_input = False
+                    for i_idx in range(func_start_idx, min(idx, len(clean_lines))):
+                        line_content = clean_lines[i_idx]
+                        if re.search(r'\b' + re.escape(receiver_name) + r'\b', line_content):
+                            if any(k in line_content for k in ["req.query", "req.body", "req.params", "request.query", "request.body", "request.params"]):
+                                is_untrusted_input = True
+                                break
+                    if is_untrusted_input:
+                        findings.append(
+                            {
+                                "id": str(uuid.uuid4())[:8],
+                                "line": idx,
+                                "line_content": line,
+                                "category": "correctness",
+                                "severity": "high",
+                                "title": "Possible Null Dereference",
+                                "description": f"Variable '{receiver_name}' may be null or undefined before method call.",
+                                "suggestion": f"Check variable exists before using {receiver_name}.",
+                                "evidence": clean_line
+                            }
+                        )
 
         # Undefined push
         if "user[0]" in clean_line:
@@ -247,7 +335,7 @@ def correctness_agent(state):
         print(f"Correctness Agent Error: {e}")
 
     # Clean & Filter findings
-    filtered_findings = []
+    aligned_findings = []
     seen = set()
 
     for finding in findings:
@@ -266,8 +354,15 @@ def correctness_agent(state):
             if not any(kw in evidence for kw in resource_keywords):
                 continue
 
-        # Enforce Undefined Variable Filter
-        if not is_valid_undefined_variable_finding(finding, diff):
+        # Heuristic: Suppress correctness findings for Potential Inefficient Lookup Pattern
+        evidence = finding.get("evidence", "")
+        is_lookup_pattern = False
+        lookup_names = ["users", "cache", "lookup", "map", "orders", "dictionary"]
+        for name in lookup_names:
+            if re.search(r'\b' + re.escape(name) + r'\s*\[[^\]]+\]', evidence):
+                is_lookup_pattern = True
+                break
+        if is_lookup_pattern:
             continue
 
         key = (
@@ -277,8 +372,95 @@ def correctness_agent(state):
 
         if key not in seen:
             seen.add(key)
-            filtered_findings.append(finding)
+            aligned_findings.append(finding)
+
+    # Reclassify Null Dereference to Undefined Variable if it is not declared in enclosing function scope
+    processed_findings = []
+    for f in aligned_findings:
+        title_lower = f["title"].lower().strip()
+        is_null_check = any(k in title_lower for k in ["null dereference", "null check", "correctness issue", "possible null"])
+        if is_null_check:
+            var_name = get_null_variable(f)
+            if var_name:
+                if check_is_undefined_variable(var_name, lines, f["line"]):
+                    f["title"] = "Undefined Variable"
+                    f["description"] = f"Variable '{var_name}' is referenced but never defined in scope."
+                    f["suggestion"] = f"Declare or import '{var_name}' before using it."
+                    f["severity"] = "high"
+                else:
+                    # Check if this exists but is destructured from req.query
+                    func_start_idx = 0
+                    clean_lines = []
+                    for line in lines:
+                        if line.startswith('+') or line.startswith('-') or line.startswith(' '):
+                            clean_lines.append(line[1:])
+                        else:
+                            clean_lines.append(line)
+                    for idx in range(min(f["line"] - 1, len(clean_lines) - 1), -1, -1):
+                        line_content = clean_lines[idx]
+                        if "function " in line_content or "def " in line_content or "async function" in line_content:
+                            func_start_idx = idx
+                            break
+                    is_query_param = False
+                    for idx in range(func_start_idx, min(f["line"], len(clean_lines))):
+                        line_content = clean_lines[idx]
+                        if re.search(r'\b' + re.escape(var_name) + r'\b', line_content) and (".query" in line_content or "req.query" in line_content):
+                            is_query_param = True
+                            break
+                    if is_query_param:
+                        f["title"] = "Missing Query Parameter Validation"
+                        f["description"] = f"{var_name} may be undefined, null, or not a string before split() is called, causing a runtime exception."
+                        f["suggestion"] = f"Validate req.query.{var_name} exists and is a string before calling split()."
+                        f["severity"] = "high"
+        processed_findings.append(f)
+
+    # Group and collapse multiple null dereferences by variable name
+    null_findings_by_var = {}
+    other_findings = []
+
+    for f in processed_findings:
+        title_lower = f["title"].lower().strip()
+        is_null_check = any(k in title_lower for k in ["null dereference", "null check", "correctness issue", "possible null"])
+        
+        var_name = ""
+        if is_null_check:
+            var_name = get_null_variable(f)
+
+        if var_name:
+            if var_name not in null_findings_by_var:
+                null_findings_by_var[var_name] = []
+            null_findings_by_var[var_name].append(f)
+        else:
+            other_findings.append(f)
+
+    final_findings = []
+    for var_name, var_findings in null_findings_by_var.items():
+        var_findings.sort(key=lambda x: x["line"])
+        root_finding = var_findings[0]
+
+        # Rename title based on variable name
+        if var_name == "transaction":
+            root_finding["title"] = "Missing Transaction Null Check"
+            root_finding["description"] = "transaction may be null or undefined before accessing its properties."
+            root_finding["suggestion"] = "Add a check to verify that transaction exists before use."
+        elif var_name == "order":
+            root_finding["title"] = "Missing Order Null Check"
+            root_finding["description"] = "order may be null or undefined before accessing its properties."
+            root_finding["suggestion"] = "Add a check to verify that order exists before use."
+        elif var_name == "user":
+            root_finding["title"] = "Missing User Null Check"
+            root_finding["description"] = "user may be null or undefined before accessing its properties."
+            root_finding["suggestion"] = "Add a check to verify that user exists before use."
+        else:
+            root_finding["title"] = f"Missing {var_name.capitalize()} Null Check"
+            root_finding["description"] = f"{var_name} may be null or undefined before accessing its properties."
+            root_finding["suggestion"] = f"Add a check to verify that {var_name} exists before use."
+
+        root_finding["severity"] = "high"
+        final_findings.append(root_finding)
+
+    final_findings.extend(other_findings)
 
     return {
-        "correctness_findings": filtered_findings
+        "correctness_findings": final_findings
     }

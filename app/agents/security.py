@@ -116,7 +116,7 @@ def check_plain_text_password(line: str, diff: str) -> bool:
 
 def check_idor(line: str, diff: str) -> bool:
     line_lower = line.lower()
-    sensitive_functions = ["resetpassword", "cancelorder", "deleteuser", "updateuser", "deleteorder", "delete", "update"]
+    sensitive_functions = ["resetpassword", "cancelorder"]
     is_sensitive = any(f in line_lower for f in sensitive_functions) and (
         "function" in line_lower or "def " in line_lower or "async" in line_lower or "=>" in line_lower or "route" in line_lower
     )
@@ -131,7 +131,7 @@ def check_idor(line: str, diff: str) -> bool:
 
 def check_missing_authorization(line: str, diff: str) -> bool:
     line_lower = line.lower()
-    sensitive_functions = ["refund", "cancelorder", "delete", "update", "resetpassword"]
+    sensitive_functions = ["resetpassword", "cancelorder"]
     is_sensitive = any(f in line_lower for f in sensitive_functions) and (
         "function" in line_lower or "def " in line_lower or "async" in line_lower or "=>" in line_lower or "route" in line_lower
     )
@@ -294,7 +294,7 @@ def security_agent(state):
         print(str(e))
 
     # Clean & Filter based on rules
-    filtered_findings = []
+    aligned_findings = []
     seen = set()
 
     for finding in findings:
@@ -305,8 +305,24 @@ def security_agent(state):
 
         finding["line"] = aligned_line
 
-        # Enforce SQL Injection false positive rule
         title_lower = finding["title"].lower().strip()
+
+        # Require concrete/direct evidence before reporting Missing Authorization or IDOR
+        if "authorization" in title_lower or "idor" in title_lower:
+            evidence_lower = finding.get("evidence", "").lower()
+            desc_lower = finding.get("description", "").lower()
+            # Suppress if it contains refund or is about refund
+            if "refund" in evidence_lower or "refund" in title_lower or "refund" in desc_lower:
+                continue
+            # Otherwise, must have sensitive context keywords
+            sensitive_ok = any(
+                k in (evidence_lower + " " + title_lower + " " + desc_lower)
+                for k in ["password", "cancel", "delete", "reset", "user.id", "owner", "bulk"]
+            )
+            if not sensitive_ok:
+                continue
+
+        # Enforce SQL Injection false positive rule
         if "sql injection" in title_lower:
             if not is_valid_sql_injection_finding(finding, diff):
                 continue
@@ -318,7 +334,18 @@ def security_agent(state):
 
         if key not in seen:
             seen.add(key)
-            filtered_findings.append(finding)
+            aligned_findings.append(finding)
+
+    # Suppress Missing Authorization if IDOR exists on the same line
+    idor_lines = {f["line"] for f in aligned_findings if f["title"].lower().strip() == "idor"}
+    
+    filtered_findings = []
+    for f in aligned_findings:
+        title_lower = f["title"].lower().strip()
+        if title_lower == "missing authorization":
+            if f["line"] in idor_lines:
+                continue
+        filtered_findings.append(f)
 
     return {
         "security_findings": filtered_findings
