@@ -168,7 +168,7 @@ def correctness_agent(state):
 
         clean_line = line[1:].strip()
 
-        # Missing transaction null check
+       
         if "transaction['status']" in clean_line:
             findings.append(
                 {
@@ -184,7 +184,6 @@ def correctness_agent(state):
                 }
             )
 
-        # Missing request validation
         if "request.json" in clean_line:
             findings.append(
                 {
@@ -200,14 +199,14 @@ def correctness_agent(state):
                 }
             )
 
-        # JS split/trim/toLowerCase/toUpperCase/map/filter without validation
+       
         dangerous_methods = [".split(", ".trim(", ".toLowerCase(", ".toUpperCase(", ".map(", ".filter("]
         if any(method in clean_line for method in dangerous_methods):
             match = re.search(r'\b([a-zA-Z_][a-zA-Z0-9_]*)\s*\.(?:split|trim|toLowerCase|toUpperCase|map|filter)\b', clean_line)
             if match:
                 receiver_name = match.group(1)
                 if receiver_name not in ["req", "res", "response", "request", "db", "console", "Math", "Date"]:
-                    # Find where it is declared in function scope to check if it's an untrusted input
+                    
                     func_start_idx = 0
                     clean_lines = []
                     for l in lines:
@@ -242,7 +241,6 @@ def correctness_agent(state):
                             }
                         )
 
-        # Undefined push
         if "user[0]" in clean_line:
             findings.append(
                 {
@@ -258,7 +256,7 @@ def correctness_agent(state):
                 }
             )
 
-        # Order null check
+       
         if "order.status" in clean_line:
             findings.append(
                 {
@@ -274,7 +272,7 @@ def correctness_agent(state):
                 }
             )
 
-        # NaN discount
+        
         if "discounts[discountCode]" in clean_line:
             findings.append(
                 {
@@ -290,7 +288,7 @@ def correctness_agent(state):
                 }
             )
 
-        # Resource Leak Detection
+       
         if check_resource_leak(clean_line, diff):
             findings.append(
                 {
@@ -306,7 +304,7 @@ def correctness_agent(state):
                 }
             )
 
-    # LLM Analysis
+    
     try:
         response = llm.invoke(CORRECTNESS_PROMPT.format(diff=diff))
 
@@ -334,19 +332,19 @@ def correctness_agent(state):
     except Exception as e:
         print(f"Correctness Agent Error: {e}")
 
-    # Clean & Filter findings
+    
     aligned_findings = []
     seen = set()
 
     for finding in findings:
-        # Align and validate evidence
+        
         is_valid, aligned_line = align_and_validate_finding(finding, lines)
         if not is_valid:
             continue
 
         finding["line"] = aligned_line
 
-        # Enforce Resource Leak deterministic filter
+       
         title_lower = finding["title"].lower().strip()
         if "resource leak" in title_lower:
             evidence = finding.get("evidence", "")
@@ -354,7 +352,7 @@ def correctness_agent(state):
             if not any(kw in evidence for kw in resource_keywords):
                 continue
 
-        # Heuristic: Suppress correctness findings for Potential Inefficient Lookup Pattern
+        
         evidence = finding.get("evidence", "")
         is_lookup_pattern = False
         lookup_names = ["users", "cache", "lookup", "map", "orders", "dictionary"]
@@ -374,7 +372,7 @@ def correctness_agent(state):
             seen.add(key)
             aligned_findings.append(finding)
 
-    # Reclassify Null Dereference to Undefined Variable if it is not declared in enclosing function scope
+    
     processed_findings = []
     for f in aligned_findings:
         title_lower = f["title"].lower().strip()
@@ -388,7 +386,7 @@ def correctness_agent(state):
                     f["suggestion"] = f"Declare or import '{var_name}' before using it."
                     f["severity"] = "high"
                 else:
-                    # Check if this exists but is destructured from req.query
+                    
                     func_start_idx = 0
                     clean_lines = []
                     for line in lines:
@@ -414,7 +412,7 @@ def correctness_agent(state):
                         f["severity"] = "high"
         processed_findings.append(f)
 
-    # Group and collapse multiple null dereferences by variable name
+    
     null_findings_by_var = {}
     other_findings = []
 
@@ -438,7 +436,7 @@ def correctness_agent(state):
         var_findings.sort(key=lambda x: x["line"])
         root_finding = var_findings[0]
 
-        # Rename title based on variable name
+        
         if var_name == "transaction":
             root_finding["title"] = "Missing Transaction Null Check"
             root_finding["description"] = "transaction may be null or undefined before accessing its properties."

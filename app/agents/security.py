@@ -156,7 +156,7 @@ def security_agent(state):
 
         clean_line = line[1:].strip()
 
-        # SQL Injection
+        
         if (
             any(k in clean_line for k in ["SELECT", "UPDATE", "DELETE", "INSERT"])
             and ("{" in clean_line or " + " in clean_line or 'f"' in clean_line or "f'" in clean_line or ".format(" in clean_line.lower())
@@ -176,7 +176,7 @@ def security_agent(state):
                     }
                 )
 
-        # Hardcoded Secrets
+        
         if (
             ("sk_live_" in clean_line or "sk_test_" in clean_line)
             or (
@@ -200,7 +200,7 @@ def security_agent(state):
                 }
             )
 
-        # XSS Detection
+       
         if "template.replace(" in clean_line or "innerHTML" in clean_line:
             findings.append(
                 {
@@ -216,7 +216,7 @@ def security_agent(state):
                 }
             )
 
-        # Plain Text Password Storage
+        
         if check_plain_text_password(clean_line, diff):
             findings.append(
                 {
@@ -232,7 +232,7 @@ def security_agent(state):
                 }
             )
 
-        # IDOR Detection
+        
         if check_idor(clean_line, diff):
             findings.append(
                 {
@@ -248,7 +248,7 @@ def security_agent(state):
                 }
             )
 
-        # Missing Authorization
+        
         if check_missing_authorization(clean_line, diff):
             findings.append(
                 {
@@ -264,7 +264,7 @@ def security_agent(state):
                 }
             )
 
-    # LLM Analysis
+   
     try:
         prompt = SECURITY_PROMPT.format(diff=diff)
         response = llm.invoke(prompt)
@@ -293,12 +293,12 @@ def security_agent(state):
         print("\nSecurity Agent Error:")
         print(str(e))
 
-    # Clean & Filter based on rules
+    
     aligned_findings = []
     seen = set()
 
     for finding in findings:
-        # Align and validate evidence
+        
         is_valid, aligned_line = align_and_validate_finding(finding, lines)
         if not is_valid:
             continue
@@ -307,14 +307,14 @@ def security_agent(state):
 
         title_lower = finding["title"].lower().strip()
 
-        # Require concrete/direct evidence before reporting Missing Authorization or IDOR
+        
         if "authorization" in title_lower or "idor" in title_lower:
             evidence_lower = finding.get("evidence", "").lower()
             desc_lower = finding.get("description", "").lower()
-            # Suppress if it contains refund or is about refund
+            
             if "refund" in evidence_lower or "refund" in title_lower or "refund" in desc_lower:
                 continue
-            # Otherwise, must have sensitive context keywords
+            
             sensitive_ok = any(
                 k in (evidence_lower + " " + title_lower + " " + desc_lower)
                 for k in ["password", "cancel", "delete", "reset", "user.id", "owner", "bulk"]
@@ -322,7 +322,7 @@ def security_agent(state):
             if not sensitive_ok:
                 continue
 
-        # Enforce SQL Injection false positive rule
+        
         if "sql injection" in title_lower:
             if not is_valid_sql_injection_finding(finding, diff):
                 continue

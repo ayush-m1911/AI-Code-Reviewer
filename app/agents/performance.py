@@ -125,7 +125,7 @@ def performance_agent(state):
     findings = []
     lines = diff.splitlines()
 
-    # Track loop context
+    
     inside_collection_loop_lines, inside_polling_loop_lines = check_loops(lines)
 
     for idx, line in enumerate(lines, start=1):
@@ -134,7 +134,7 @@ def performance_agent(state):
 
         clean_line = line[1:].strip()
 
-        # N+1 Query Pattern
+       
         is_db_call = any(
             kw in clean_line
             for kw in [
@@ -158,7 +158,7 @@ def performance_agent(state):
                 }
             )
 
-        # Infinite Polling Loop
+        
         if "while (status === 'pending')" in clean_line or "while(status === 'pending')" in clean_line:
             findings.append(
                 {
@@ -174,7 +174,7 @@ def performance_agent(state):
                 }
             )
 
-        # Sequential Async Execution
+        
         if "await cancelOrder" in clean_line:
             findings.append(
                 {
@@ -190,7 +190,7 @@ def performance_agent(state):
                 }
             )
 
-        # Sleep Inside Polling
+        
         if "sleep(1000)" in clean_line:
             findings.append(
                 {
@@ -206,7 +206,7 @@ def performance_agent(state):
                 }
             )
 
-        # Large Collection Loop
+        
         if "for (const id of userIds)" in clean_line or "for (const id of orderIds)" in clean_line:
             findings.append(
                 {
@@ -222,7 +222,7 @@ def performance_agent(state):
                 }
             )
 
-        # Potential Inefficient Lookup Pattern
+        
         is_inefficient = False
         inefficient_patterns = [
             "users[log.user_id]",
@@ -257,7 +257,7 @@ def performance_agent(state):
             )
 
 
-    # LLM Analysis
+    
     try:
         response = llm.invoke(PERFORMANCE_PROMPT.format(diff=diff))
 
@@ -285,19 +285,19 @@ def performance_agent(state):
     except Exception as e:
         print(f"Performance Agent Error: {e}")
 
-    # Clean & Filter findings
+    
     filtered_findings = []
     seen = set()
 
     for finding in findings:
-        # Align and validate evidence
+        
         is_valid, aligned_line = align_and_validate_finding(finding, lines)
         if not is_valid:
             continue
 
         finding["line"] = aligned_line
 
-        # Enforce N+1 Query loop check
+        
         title_lower = finding["title"].lower().strip()
         if "n+1" in title_lower or "n + 1" in title_lower:
             if finding["line"] not in inside_collection_loop_lines:
