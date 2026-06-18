@@ -338,7 +338,6 @@ LLM analysis improves recall for:
 * Complex Runtime Bugs
 * Missing Test Coverage
 * Maintainability Issues
-* 
 ---
 # Why Hybrid Instead of LLM Only?
 
@@ -373,9 +372,34 @@ Benefits:
 * Easier prompt tuning
 * Reduced prompt complexity
 * Independent agent improvements
+---
+# LangGraph Nodes
+
+## security_agent
+
+Detects security vulnerabilities and authorization issues.
+
+## correctness_agent
+
+Detects runtime failures, null dereferences, validation gaps, and logical bugs.
+
+## performance_agent
+
+Detects scalability bottlenecks such as N+1 queries, polling loops, and sequential async workflows.
+
+## style_agent
+
+Detects maintainability and code quality concerns.
+
+## test_coverage_agent
+
+Identifies missing tests and edge cases.
+
+## merge_node
+
+Aggregates findings, removes duplicates, computes severity, generates verdicts, and produces the final ReviewReport.
 
 ---
-
 # Sample Output
 
 The system generates:
